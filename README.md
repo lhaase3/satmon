@@ -1,4 +1,3 @@
-<<<<<<< anomaly-detection
 # SatMon - Satellite Telemetry Anomaly Detection
 
 A production-ready backend system for ingesting satellite telemetry data and detecting anomalies using machine learning. Built for aerospace applications with real NASA datasets.
@@ -316,3 +315,4 @@ Detectors compute outliers over a time window and persist windows into anomaly_d
 with a consistent score and method. The FastAPI service is a clean read API for dashboards,
 notebooks, or alerts.
 >>>>>>> main
+
