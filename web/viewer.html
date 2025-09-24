@@ -1,0 +1,211 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>SatMon Viewer</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <!-- Chart.js + date adapter + annotation plugin -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 20px; color: #e6e6e6; background:#0f1115;}
+    .panel { display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; }
+    label { font-size: 12px; display:block; opacity:.9; margin-bottom:4px; }
+    input, select, button { padding:8px; border-radius:8px; border:1px solid #333; background:#151820; color:#e6e6e6; }
+    button { cursor:pointer; }
+    .row { display:flex; gap:12px; align-items:center; }
+    .method { display:flex; gap:10px; align-items:center;}
+    #status { font-size:12px; opacity:.8; margin-top:8px;}
+    canvas { background:#0b0d12; border:1px solid #222; border-radius:12px; padding:8px; }
+  </style>
+</head>
+<body>
+  <h1>SatMon Viewer</h1>
+  <div class="panel">
+    <div>
+      <label>API base URL</label>
+      <input id="baseUrl" value="http://127.0.0.1:8000" style="width:260px" />
+    </div>
+
+    <div>
+      <label>Channel</label>
+      <select id="channelSelect" style="width:260px"></select>
+    </div>
+
+    <div>
+      <label>Start (UTC, ISO)</label>
+      <!-- Use your demo range the first time you run -->
+      <input id="startIso" value="2025-01-01T00:00:00Z" style="width:220px"/>
+    </div>
+
+    <div>
+      <label>End (UTC, ISO)</label>
+      <input id="endIso" value="2025-01-01T10:00:00Z" style="width:220px"/>
+    </div>
+
+    <div class="method">
+      <label>Methods</label>
+      <div class="row">
+        <label><input type="checkbox" id="mZ" checked /> z-score</label>
+        <label><input type="checkbox" id="mIF" checked /> IsolationForest</label>
+      </div>
+    </div>
+
+    <div>
+      <button id="loadBtn">Load</button>
+    </div>
+  </div>
+
+  <div id="status"></div>
+  <div style="margin-top:16px;">
+    <canvas id="chart" height="120"></canvas>
+  </div>
+
+<script>
+const els = {
+  baseUrl: document.getElementById('baseUrl'),
+  channel: document.getElementById('channelSelect'),
+  start: document.getElementById('startIso'),
+  end: document.getElementById('endIso'),
+  mZ: document.getElementById('mZ'),
+  mIF: document.getElementById('mIF'),
+  btn: document.getElementById('loadBtn'),
+  status: document.getElementById('status'),
+  canvas: document.getElementById('chart'),
+};
+
+let chart;
+
+// helper: GET JSON
+async function jget(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+  return r.json();
+}
+
+function setStatus(msg) { els.status.textContent = msg; }
+
+// 1) Load channels into dropdown
+async function initChannels() {
+  const base = els.baseUrl.value.replace(/\/$/, '');
+  const channels = await jget(`${base}/channels`);
+  els.channel.innerHTML = '';
+  for (const c of channels) {
+    const opt = document.createElement('option');
+    opt.value = String(c.id); // make sure it's a string
+    opt.textContent = `[${c.source}] ${c.channel_key}` + (c.units ? ` (${c.units})` : '');
+    els.channel.appendChild(opt);
+  }
+  if (channels.length) {
+    els.channel.value = String(channels[0].id); // auto-select first
+    els.btn.disabled = false;
+    setStatus('Ready. Pick a window and click Load.');
+  } else {
+    setStatus('No channels found. Ingest data first.');
+  }
+}
+
+
+// 2) Fetch timeseries + anomalies
+async function loadData() {
+  const base = els.baseUrl.value.replace(/\/$/, '');
+  const cid = els.channel.value;
+  if (!cid) { setStatus('Pick a channel first.'); return; }
+  const start = els.start.value;
+  const end = els.end.value;
+
+  setStatus('Loading data...');
+  const tsUrl = `${base}/timeseries?channel_id=${cid}&start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`;
+  const series = await jget(tsUrl);
+
+  // methods filter: build separate calls so we can color/shade per method
+  const anom = [];
+  if (els.mZ.checked) {
+    const url = `${base}/anomalies?channel_id=${cid}&start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}&method=zscore`;
+    anom.push(...await jget(url).catch(()=>[]));
+  }
+  if (els.mIF.checked) {
+    const url = `${base}/anomalies?channel_id=${cid}&start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}&method=isoforest`;
+    anom.push(...await jget(url).catch(()=>[]));
+  }
+
+  render(series.points || [], anom);
+  setStatus(`Loaded ${series.points?.length||0} points, ${anom.length} anomaly windows.`);
+}
+
+// 3) Draw chart with shaded anomaly boxes
+function render(points, anomalies) {
+  const data = points.map(p => ({ x: new Date(p.ts), y: p.value }));
+
+  // Build annotation boxes: red for zscore, blue for IF
+  const annos = {};
+  let i = 0;
+  for (const a of anomalies) {
+    const color = a.method === 'zscore' ? 'rgba(255,68,68,0.18)' : 'rgba(86,156,214,0.18)';
+    const border = a.method === 'zscore' ? 'rgba(255,68,68,0.6)' : 'rgba(86,156,214,0.6)';
+    annos['a'+(i++)] = {
+      type: 'box',
+      xMin: new Date(a.window_start),
+      xMax: new Date(a.window_end),
+      backgroundColor: color,
+      borderColor: border,
+      borderWidth: 1,
+      label: {
+        display: true,
+        content: a.method,
+        position: 'start',
+        color: '#ddd',
+        backgroundColor: 'rgba(0,0,0,0.0)',
+      }
+    };
+  }
+
+  if (chart) chart.destroy();
+  chart = new Chart(els.canvas.getContext('2d'), {
+    type: 'line',
+    data: {
+      datasets: [{
+        label: 'value',
+        data,
+        pointRadius: 0,
+        borderWidth: 1.5,
+        fill: false,
+        tension: 0,
+      }]
+    },
+    options: {
+      responsive: true,
+      parsing: false,
+      animation: false,
+      interaction: { mode: 'nearest', intersect: false },
+      plugins: {
+        legend: { display: false },
+        annotation: { annotations: annos },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${ctx.parsed.y.toFixed(3)} @ ${ctx.parsed.x}`
+          }
+        }
+      },
+      scales: {
+        x: { type: 'time', time: { tooltipFormat: 'yyyy-MM-dd HH:mm:ss' }, ticks: { color:'#aaa' }, grid:{color:'#1f2430'} },
+        y: { ticks: { color:'#aaa' }, grid:{color:'#1f2430'} }
+      }
+    },
+    plugins: [Chart.registry.plugins.get('annotation')],
+  });
+}
+
+// Wire up UI
+els.btn.addEventListener('click', () => {
+  loadData().catch(e => setStatus(`Error: ${e.message}`));
+});
+
+// Boot
+initChannels()
+  .then(() => setStatus('Ready. Pick a channel and time window, then Load.'))
+  .catch(e => setStatus(`Error: ${e.message}`));
+</script>
+</body>
+</html>

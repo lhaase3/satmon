@@ -19,6 +19,13 @@ from datetime import datetime, timezone, timedelta
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import IsolationForest
+from pathlib import Path
+import sys
+
+# Add the project root to Python path
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from services.api.db import SessionLocal, init_db
 from services.api.models import Telemetry, Anomaly

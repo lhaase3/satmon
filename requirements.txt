@@ -7,3 +7,6 @@ python-dotenv
 pandas
 numpy
 scikit-learn
+requests
+matplotlib
+seaborn
