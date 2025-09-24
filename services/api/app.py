@@ -4,8 +4,23 @@ from datetime import datetime
 from typing import Optional, List
 from .db import init_db, get_db
 from .models import Channel, Telemetry, Anomaly
+from fastapi.middleware.cors import CORSMiddleware
+from pathlib import Path
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI(title="SatMon API")
+
+# allow read-only GETs from any origin (fine for local dev)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["GET"],
+    allow_headers=["*"],
+)
+
+# serve /viewer/* from the local web/ folder
+STATIC_DIR = Path(__file__).resolve().parents[2] / "web"
+app.mount("/viewer", StaticFiles(directory=STATIC_DIR, html=True), name="viewer")
 
 @app.on_event("startup")
 def startup():

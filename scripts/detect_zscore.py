@@ -1,13 +1,16 @@
 import argparse, pandas as pd, numpy as np
 from datetime import datetime, timezone
 from sqlalchemy.orm import Session
-from services.api.db import SessionLocal, init_db
-from services.api.models import Telemetry, Anomaly
 from pathlib import Path
 import sys
+
+# Add the project root to Python path
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
+
+from services.api.db import SessionLocal, init_db
+from services.api.models import Telemetry, Anomaly
 
 def detect_anomalies(df: pd.DataFrame, win=100, z=3.0, min_pts=20):
     df = df.sort_values("ts").copy()
