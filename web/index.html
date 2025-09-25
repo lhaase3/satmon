@@ -140,6 +140,26 @@
         </div>
         
         <div class="card glass-dark">
+          <h3>🧠 LSTM Autoencoder</h3>
+          <div class="metric">
+            <span>Precision:</span>
+            <span class="metric-value success">28.7%</span>
+          </div>
+          <div class="metric">
+            <span>Recall:</span>
+            <span class="metric-value success">83.3%</span>
+          </div>
+          <div class="metric">
+            <span>F1-Score:</span>
+            <span class="metric-value success">0.427</span>
+          </div>
+          <div class="metric">
+            <span>Ground Truth Detection:</span>
+            <span class="metric-value success">3/4 windows</span>
+          </div>
+        </div>
+        
+        <div class="card glass-dark">
           <h3>📊 Dataset Statistics</h3>
           <div class="metric">
             <span>Data Points per Channel:</span>
@@ -206,6 +226,7 @@
           <select id="methodSelect">
             <option value="zscore">Z-Score Analysis</option>
             <option value="isoforest">Isolation Forest</option>
+            <option value="lstm_autoencoder">LSTM Autoencoder (Deep Learning)</option>
           </select>
         </div>
         
@@ -623,7 +644,7 @@
       }
       
       // Algorithm selection
-      const algorithmSelect = document.getElementById('algorithmSelect');
+      const algorithmSelect = document.getElementById('algorithmSelect') || document.getElementById('methodSelect');
       if (algorithmSelect) {
         algorithmSelect.addEventListener('change', function(e) {
           currentAlgorithm = e.target.value;

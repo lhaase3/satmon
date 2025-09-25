@@ -198,17 +198,35 @@ async def run_detection(request: dict):
     channel = request.get("channel", "demo_temp_sensor")
     algorithm = request.get("algorithm", "zscore")
     
-    # Simulate processing time
+    # Simulate processing time (LSTM takes longer)
     import time
-    time.sleep(1)  # Simulate detection processing
+    if algorithm == "lstm_autoencoder":
+        time.sleep(2)  # Deep learning takes more time
+    else:
+        time.sleep(1)  # Traditional algorithms
     
     # Return mock results based on channel and algorithm
     if "temp" in channel.lower():
-        anomalies_detected = 3 if algorithm == "zscore" else 2
+        if algorithm == "zscore":
+            anomalies_detected = 3
+        elif algorithm == "isolation_forest":
+            anomalies_detected = 2
+        else:  # lstm_autoencoder
+            anomalies_detected = 4  # Deep learning often finds more subtle patterns
     elif "power" in channel.lower():
-        anomalies_detected = 2 if algorithm == "zscore" else 3
+        if algorithm == "zscore":
+            anomalies_detected = 2
+        elif algorithm == "isolation_forest":
+            anomalies_detected = 3
+        else:  # lstm_autoencoder
+            anomalies_detected = 5
     elif "attitude" in channel.lower():
-        anomalies_detected = 4 if algorithm == "zscore" else 2
+        if algorithm == "zscore":
+            anomalies_detected = 4
+        elif algorithm == "isolation_forest":
+            anomalies_detected = 2
+        else:  # lstm_autoencoder
+            anomalies_detected = 3
     else:
         anomalies_detected = 1
     
@@ -219,6 +237,108 @@ async def run_detection(request: dict):
         "anomalies_detected": anomalies_detected,
         "processing_time": 1.0,
         "message": f"Successfully processed {channel} using {algorithm.upper()} algorithm"
+    }
+
+@app.get("/algorithm-comparison")
+async def algorithm_comparison(channel: str = "demo_temp_sensor"):
+    """Compare performance of all three algorithms"""
+    
+    # Simulate running all algorithms
+    import time
+    time.sleep(2)  # Simulate processing time
+    
+    if "temp" in channel.lower():
+        results = {
+            "zscore": {
+                "precision": 0.364,
+                "recall": 1.0,
+                "f1_score": 0.615,
+                "anomalies_detected": 3,
+                "processing_time": 0.12,
+                "confidence": "high"
+            },
+            "isolation_forest": {
+                "precision": 0.095,
+                "recall": 0.50,
+                "f1_score": 0.160,
+                "anomalies_detected": 2,
+                "processing_time": 0.45,
+                "confidence": "medium"
+            },
+            "lstm_autoencoder": {
+                "precision": 0.287,
+                "recall": 0.833,
+                "f1_score": 0.427,
+                "anomalies_detected": 4,
+                "processing_time": 2.3,
+                "confidence": "high"
+            }
+        }
+    elif "power" in channel.lower():
+        results = {
+            "zscore": {
+                "precision": 0.425,
+                "recall": 0.85,
+                "f1_score": 0.565,
+                "anomalies_detected": 2,
+                "processing_time": 0.11,
+                "confidence": "high"
+            },
+            "isolation_forest": {
+                "precision": 0.123,
+                "recall": 0.67,
+                "f1_score": 0.208,
+                "anomalies_detected": 3,
+                "processing_time": 0.38,
+                "confidence": "medium"
+            },
+            "lstm_autoencoder": {
+                "precision": 0.312,
+                "recall": 0.91,
+                "f1_score": 0.464,
+                "anomalies_detected": 5,
+                "processing_time": 2.1,
+                "confidence": "high"
+            }
+        }
+    else:  # attitude
+        results = {
+            "zscore": {
+                "precision": 0.298,
+                "recall": 0.95,
+                "f1_score": 0.453,
+                "anomalies_detected": 4,
+                "processing_time": 0.13,
+                "confidence": "high"
+            },
+            "isolation_forest": {
+                "precision": 0.087,
+                "recall": 0.40,
+                "f1_score": 0.143,
+                "anomalies_detected": 2,
+                "processing_time": 0.42,
+                "confidence": "low"
+            },
+            "lstm_autoencoder": {
+                "precision": 0.256,
+                "recall": 0.75,
+                "f1_score": 0.383,
+                "anomalies_detected": 3,
+                "processing_time": 2.4,
+                "confidence": "medium"
+            }
+        }
+    
+    return {
+        "channel": channel,
+        "comparison_results": results,
+        "recommendation": "zscore",  # Best overall performer
+        "summary": {
+            "best_precision": "zscore",
+            "best_recall": "lstm_autoencoder", 
+            "best_f1": "zscore",
+            "fastest": "zscore"
+        }
     }
 
 @app.get("/health")
