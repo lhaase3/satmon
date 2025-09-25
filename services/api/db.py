@@ -11,7 +11,10 @@ load_dotenv(env_path)
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 if not DATABASE_URL:
-    raise RuntimeError("DATABASE_URL not set. Add it to a .env at the repo root or set the env var.")
+    # Fall back to SQLite for demo purposes
+    db_path = Path(__file__).resolve().parents[2] / "satmon_demo.db"
+    DATABASE_URL = f"sqlite:///{db_path}"
+    print(f"Using SQLite database: {DATABASE_URL}")
 
 engine = create_engine(DATABASE_URL, pool_pre_ping=True, future=True)
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False, future=True)
