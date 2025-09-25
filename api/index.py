@@ -1,16 +1,6 @@
-#!/usr/bin/env python3
-"""
-Vercel serverless function for SatMon
-"""
-
-import sys
-import os
 from http.server import BaseHTTPRequestHandler
 import json
-from urllib.parse import urlparse, parse_qs
-
-# Add the project root to Python path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+from urllib.parse import urlparse
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
