@@ -67,7 +67,7 @@
       <h2 class="section-title">Key Features</h2>
       <div class="grid grid-cols-3">
         <div class="card glass">
-          <h3>🤖 Multi-Algorithm Detection</h3>
+          <h3><img src="/static/icons/multi-algo.svg" alt="Multi-Algorithm" style="width: 24px; height: 24px; display: inline-block; margin-right: 8px; vertical-align: middle;"> Multi-Algorithm Detection</h3>
           <p>Z-Score statistical analysis, Isolation Forest ML algorithms, and LSTM autoencoders with comprehensive performance evaluation against ground truth data.</p>
         </div>
         <div class="card glass">
@@ -79,17 +79,17 @@
           <p>FastAPI backend, PostgreSQL time-series database, Docker containerization, REST API endpoints, and automated deployment pipeline.</p>
         </div>
         <div class="card glass">
-          <h3>🔬 NASA-Grade Data</h3>
+          <h3><img src="/static/icons/nasa-data.svg" alt="NASA-Grade Data" style="width: 24px; height: 24px; display: inline-block; margin-right: 8px; vertical-align: middle;"> NASA-Grade Data</h3>
           <p>Synthetic telemetry data that mimics real NASA JPL spacecraft patterns with realistic anomaly injection and ground truth labeling.</p>
         </div>
         <div class="card glass">
           <h3>📈 Performance Metrics</h3>
           <p>Comprehensive evaluation framework with precision, recall, F1-scores, and window-based overlap detection for rigorous performance analysis.</p>
         </div>
-        <div class="card glass">
+        <!-- <div class="card glass">
           <h3>🚀 Deployment Ready</h3>
           <p>Fully containerized with Docker Compose, environment configuration, health checks, and automated data loading for production deployment.</p>
-        </div>
+        </div> -->
       </div>
     </div>
   </section>
@@ -100,7 +100,7 @@
       <h2 class="section-title">Performance Results</h2>
       <div class="grid grid-cols-2">
         <div class="card glass-dark">
-          <h3>🎯 Z-Score Algorithm</h3>
+          <h3>Z-Score Algorithm</h3>
           <div class="metric">
             <span>Precision:</span>
             <span class="metric-value success">36.4%</span>
@@ -120,7 +120,7 @@
         </div>
         
         <div class="card glass-dark">
-          <h3>🤖 Isolation Forest</h3>
+          <h3>Isolation Forest</h3>
           <div class="metric">
             <span>Precision:</span>
             <span class="metric-value warning">9.5%</span>
@@ -140,7 +140,7 @@
         </div>
         
         <div class="card glass-dark">
-          <h3>🧠 LSTM Autoencoder</h3>
+          <h3>LSTM Autoencoder</h3>
           <div class="metric">
             <span>Precision:</span>
             <span class="metric-value success">28.7%</span>
@@ -160,7 +160,7 @@
         </div>
         
         <div class="card glass-dark">
-          <h3>📊 Dataset Statistics</h3>
+          <h3>Dataset Statistics</h3>
           <div class="metric">
             <span>Data Points per Channel:</span>
             <span class="metric-value">8,760+</span>
@@ -180,7 +180,7 @@
         </div>
         
         <div class="card glass-dark">
-          <h3>⚡ System Performance</h3>
+          <h3>System Performance</h3>
           <div class="metric">
             <span>API Response Time:</span>
             <span class="metric-value success">&lt; 100ms</span>
@@ -210,7 +210,7 @@
       <h2 class="section-title">🌍 Live Space Data Integration</h2>
       <div class="grid grid-cols-2">
         <div class="card glass">
-          <h3>🚀 International Space Station</h3>
+          <h3><img src="/static/icons/space-station.svg" alt="International Space Station" style="width: 24px; height: 24px; display: inline-block; margin-right: 8px; vertical-align: middle;"> International Space Station</h3>
           <div id="issData">
             <div class="metric">
               <span>Current Position:</span>
@@ -277,7 +277,7 @@
   <!-- Live Demo Section -->
   <section id="demo" class="section demo-section">
     <div class="container">
-      <h2 class="section-title">🚀 Interactive Live Demo</h2>
+      <h2 class="section-title">Interactive Live Demo</h2>
       <p class="text-center mb-6" style="max-width: 600px; margin: 0 auto 2rem;">
         Select a spacecraft channel and run real-time anomaly detection. Watch as our algorithms identify anomalous patterns in satellite telemetry data.
       </p>
@@ -370,18 +370,18 @@
   <!-- About -->
   <section id="about" class="section">
     <div class="container text-center">
-      <h2 class="section-title">🚀 Built by Logan Haase</h2>
+      <h2 class="section-title">Built by Logan Haase</h2>
       <div class="grid grid-cols-2" style="max-width: 800px; margin: 0 auto;">
         <div class="card glass" style="text-align: left;">
           <h3>🎓 Education & Background</h3>
-          <p>Computer Science student at University of Colorado Boulder (GPA: 3.42) with coursework in Machine Learning, AI, Network Systems, and Database Systems.</p>
-          <p style="margin-top: 1rem;">Experienced in full-stack development, data science, and aerospace applications through internships at Polaris Electro-Optics, Consensus Technology Group, and Modern Prairie.</p>
+          <p>Computer Science student at University of Colorado Boulder with with a focus on Machine Learning and Systems Development.</p>
+          <p style="margin-top: 1rem;">Experienced in full-stack development, data science, and systems level development through classes, internships and personal projects.</p>
         </div>
         
         <div class="card glass" style="text-align: left;">
           <h3>💻 Technical Expertise</h3>
-          <p>Proficient in Python, JavaScript, C++, SQL with experience in FastAPI, React, PostgreSQL, Docker, and machine learning frameworks.</p>
-          <p style="margin-top: 1rem;">Passionate about building production-ready systems that solve real-world problems, with a focus on aerospace and satellite technology applications.</p>
+          <p>Proficient in Python, C, JavaScript, SQL with experience in FastAPI, React, PostgreSQL, Docker, and machine learning frameworks.</p>
+          <p style="margin-top: 1rem;">Passionate about building production-ready systems that solve real-world problems.</p>
         </div>
       </div>
       
@@ -392,9 +392,9 @@
         <a href="https://lhaase3.github.io/Portfolio" target="_blank" class="btn btn-outline" style="margin: 0.5rem;">
           Portfolio Website
         </a>
-        <a href="mailto:loganhaase3@gmail.com" class="btn btn-outline" style="margin: 0.5rem;">
+        <button onclick="openContactModal()" class="btn btn-outline" style="margin: 0.5rem;">
           Contact Me
-        </a>
+        </button>
       </div>
       
       <!-- Tech Stack -->
@@ -402,12 +402,12 @@
         <h3 style="margin-bottom: 1rem;">🛠️ Technology Stack</h3>
         <div class="grid grid-cols-3" style="max-width: 600px; margin: 0 auto;">
           <div class="text-center">
-            <div style="font-size: 2rem; margin-bottom: 0.5rem;">🐍</div>
+            <div style="margin-bottom: 0.5rem;"><img src="/static/icons/python.svg" alt="Python" style="width: 32px; height: 32px;"></div>
             <div>Python • FastAPI</div>
             <div style="font-size: 0.8rem; opacity: 0.8;">Backend & ML</div>
           </div>
           <div class="text-center">
-            <div style="font-size: 2rem; margin-bottom: 0.5rem;">🗄️</div>
+            <div style="margin-bottom: 0.5rem;"><img src="/static/icons/postgresql.svg" alt="PostgreSQL" style="width: 32px; height: 32px;"></div>
             <div>PostgreSQL • Docker</div>
             <div style="font-size: 0.8rem; opacity: 0.8;">Database & Deploy</div>
           </div>
@@ -420,6 +420,82 @@
       </div>
     </div>
   </section>
+
+  <style>
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      backdrop-filter: blur(4px);
+    }
+    
+    .modal-content {
+      background: var(--gray-800);
+      border: 1px solid var(--gray-600);
+      border-radius: 12px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      max-width: 400px;
+      width: 90%;
+      animation: modalSlideIn 0.3s ease-out;
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--gray-600);
+    }
+    
+    .modal-header h3 {
+      margin: 0;
+      color: var(--text-primary);
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.2s ease;
+    }
+    
+    .modal-close:hover {
+      background-color: var(--gray-700);
+      color: var(--text-primary);
+    }
+    
+    .modal-body {
+      padding: 0.5rem;
+    }
+    
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+  </style>
 
   <script>
     // API Configuration
@@ -661,9 +737,12 @@
         updateStatus('Loading telemetry data...');
         
         const response = await fetch(`${API_BASE}/timeseries?channel=${currentChannel}&limit=500`);
-        const data = await response.json();
+        const result = await response.json();
         
-        if (data.length === 0) {
+        // Extract the data array from the API response
+        const data = result.data || result;
+        
+        if (!data || data.length === 0) {
           updateStatus('No data available for this channel', true);
           return;
         }
@@ -697,7 +776,10 @@
     async function loadAnomalies() {
       try {
         const response = await fetch(`${API_BASE}/anomalies?channel=${currentChannel}`);
-        const anomalies = await response.json();
+        const result = await response.json();
+        
+        // Extract the anomalies array from the API response
+        const anomalies = result.anomalies || result;
         
         // Convert anomalies to chart format
         const anomalyPoints = anomalies.map(anomaly => ({
@@ -825,7 +907,81 @@
       });
     }
 
+    // Modal Functions
+    function openContactModal() {
+      document.getElementById('contactModal').style.display = 'flex';
+    }
+
+    function closeContactModal() {
+      document.getElementById('contactModal').style.display = 'none';
+    }
+
+    function copyEmail() {
+      const email = 'loganhaase3@gmail.com';
+      navigator.clipboard.writeText(email).then(() => {
+        // Temporarily change button text to show success
+        const button = event.target;
+        const originalText = button.textContent;
+        button.textContent = '✓ Copied!';
+        button.style.backgroundColor = 'var(--green-600)';
+        
+        setTimeout(() => {
+          button.textContent = originalText;
+          button.style.backgroundColor = '';
+        }, 2000);
+      }).catch(() => {
+        // Fallback for older browsers
+        alert('Email: loganhaase3@gmail.com');
+      });
+    }
+
+    // Close modal when clicking outside
+    document.addEventListener('click', function(event) {
+      const modal = document.getElementById('contactModal');
+      if (event.target === modal) {
+        closeContactModal();
+      }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeContactModal();
+      }
+    });
+
 
   </script>
+
+  <!-- Contact Modal -->
+  <div id="contactModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>📧 Contact Information</h3>
+        <button class="modal-close" onclick="closeContactModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="text-align: center; padding: 1rem;">
+          <div style="font-size: 1.2rem; margin-bottom: 1rem;">
+            <strong>Logan Haase</strong>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 1rem;">
+            <span>📧</span>
+            <a href="mailto:loganhaase3@gmail.com" style="color: var(--blue-400); text-decoration: none; font-size: 1.1rem;">
+              loganhaase3@gmail.com
+            </a>
+          </div>
+          <div style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 1rem;">
+            Feel free to reach out for opportunities, collaborations, or questions about this project!
+          </div>
+          <div style="display: flex; gap: 0.5rem; justify-content: center;">
+            <button onclick="copyEmail()" class="btn btn-outline" style="font-size: 0.9rem;">
+              Copy Email
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
