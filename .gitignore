@@ -45,3 +45,4 @@ Thumbs.db
 
 # Data files (if you don't want to commit data)
 # data/*.csv
+.vercel

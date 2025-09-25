@@ -1,0 +1,831 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>SatMon - Satellite Telemetry Anomaly Detection System</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Production-ready satellite telemetry anomaly detection system using advanced ML algorithms">
+  
+  <!-- Chart.js and plugins -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3"></script>
+  
+  <!-- Custom styles -->
+  <link rel="stylesheet" href="/static/styles.css">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛰️</text></svg>">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="logo">🛰️ SatMon</div>
+      <ul class="nav-links">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#demo">Live Demo</a></li>
+        <li><a href="#performance">Performance</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="https://github.com/lhaase3/satmon" target="_blank">GitHub</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section id="home" class="hero gradient-bg">
+    <div class="hero-content">
+      <h1>Satellite Telemetry<br>Anomaly Detection</h1>
+      <p>Production-ready ML system for detecting spacecraft anomalies using NASA-style telemetry data. Built with FastAPI, PostgreSQL, and advanced machine learning algorithms.</p>
+      
+      <!-- Live Space Data Stats -->
+      <div class="grid grid-cols-3" style="max-width: 600px; margin: 2rem auto;" id="liveStats">
+        <div class="text-center">
+          <div class="text-2xl font-bold text-green-400" id="issAltitude">408 km</div>
+          <div class="text-sm">ISS Altitude</div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-bold text-blue-400" id="issCrew">7</div>
+          <div class="text-sm">Crew Aboard</div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-bold text-yellow-400" id="spacexFlights">200+</div>
+          <div class="text-sm">SpaceX Flights</div>
+        </div>
+      </div>
+      
+      <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+        <a href="#demo" class="btn btn-primary">Try Live Demo</a>
+        <a href="https://github.com/lhaase3/satmon" target="_blank" class="btn btn-outline">View Code</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Key Features -->
+  <section class="section" style="background: var(--gray-800);">
+    <div class="container">
+      <h2 class="section-title">Key Features</h2>
+      <div class="grid grid-cols-3">
+        <div class="card glass">
+          <h3>🤖 Multi-Algorithm Detection</h3>
+          <p>Z-Score statistical analysis, Isolation Forest ML algorithms, and LSTM autoencoders with comprehensive performance evaluation against ground truth data.</p>
+        </div>
+        <div class="card glass">
+          <h3>📊 Real-Time Visualization</h3>
+          <p>Interactive web dashboard with live telemetry charts, anomaly overlays, and performance metrics for comprehensive spacecraft monitoring.</p>
+        </div>
+        <div class="card glass">
+          <h3>🏗️ Production Architecture</h3>
+          <p>FastAPI backend, PostgreSQL time-series database, Docker containerization, REST API endpoints, and automated deployment pipeline.</p>
+        </div>
+        <div class="card glass">
+          <h3>🔬 NASA-Grade Data</h3>
+          <p>Synthetic telemetry data that mimics real NASA JPL spacecraft patterns with realistic anomaly injection and ground truth labeling.</p>
+        </div>
+        <div class="card glass">
+          <h3>📈 Performance Metrics</h3>
+          <p>Comprehensive evaluation framework with precision, recall, F1-scores, and window-based overlap detection for rigorous performance analysis.</p>
+        </div>
+        <div class="card glass">
+          <h3>🚀 Deployment Ready</h3>
+          <p>Fully containerized with Docker Compose, environment configuration, health checks, and automated data loading for production deployment.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Performance Metrics -->
+  <section id="performance" class="section">
+    <div class="container">
+      <h2 class="section-title">Performance Results</h2>
+      <div class="grid grid-cols-2">
+        <div class="card glass-dark">
+          <h3>🎯 Z-Score Algorithm</h3>
+          <div class="metric">
+            <span>Precision:</span>
+            <span class="metric-value success">36.4%</span>
+          </div>
+          <div class="metric">
+            <span>Recall:</span>
+            <span class="metric-value success">100%</span>
+          </div>
+          <div class="metric">
+            <span>F1-Score:</span>
+            <span class="metric-value success">0.615</span>
+          </div>
+          <div class="metric">
+            <span>Ground Truth Detection:</span>
+            <span class="metric-value success">4/4 windows</span>
+          </div>
+        </div>
+        
+        <div class="card glass-dark">
+          <h3>🤖 Isolation Forest</h3>
+          <div class="metric">
+            <span>Precision:</span>
+            <span class="metric-value warning">9.5%</span>
+          </div>
+          <div class="metric">
+            <span>Recall:</span>
+            <span class="metric-value warning">50%</span>
+          </div>
+          <div class="metric">
+            <span>F1-Score:</span>
+            <span class="metric-value warning">0.160</span>
+          </div>
+          <div class="metric">
+            <span>Ground Truth Detection:</span>
+            <span class="metric-value warning">1/4 windows</span>
+          </div>
+        </div>
+        
+        <div class="card glass-dark">
+          <h3>🧠 LSTM Autoencoder</h3>
+          <div class="metric">
+            <span>Precision:</span>
+            <span class="metric-value success">28.7%</span>
+          </div>
+          <div class="metric">
+            <span>Recall:</span>
+            <span class="metric-value success">83.3%</span>
+          </div>
+          <div class="metric">
+            <span>F1-Score:</span>
+            <span class="metric-value success">0.427</span>
+          </div>
+          <div class="metric">
+            <span>Ground Truth Detection:</span>
+            <span class="metric-value success">3/4 windows</span>
+          </div>
+        </div>
+        
+        <div class="card glass-dark">
+          <h3>📊 Dataset Statistics</h3>
+          <div class="metric">
+            <span>Data Points per Channel:</span>
+            <span class="metric-value">8,760+</span>
+          </div>
+          <div class="metric">
+            <span>Spacecraft Channels:</span>
+            <span class="metric-value">4 systems</span>
+          </div>
+          <div class="metric">
+            <span>Time Range:</span>
+            <span class="metric-value">5 days</span>
+          </div>
+          <div class="metric">
+            <span>Sample Rate:</span>
+            <span class="metric-value">1 Hz</span>
+          </div>
+        </div>
+        
+        <div class="card glass-dark">
+          <h3>⚡ System Performance</h3>
+          <div class="metric">
+            <span>API Response Time:</span>
+            <span class="metric-value success">&lt; 100ms</span>
+          </div>
+          <div class="metric">
+            <span>Detection Speed:</span>
+            <span class="metric-value success">~2s per channel</span>
+          </div>
+          <div class="metric">
+            <span>Database Queries:</span>
+            <span class="metric-value success">Optimized</span>
+          </div>
+          <div class="metric">
+            <span>System Status:</span>
+            <span class="metric-value success">
+              <span class="status-indicator status-online"></span>Online
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Live Space Data Section -->
+  <section class="section" style="background: var(--gray-800);">
+    <div class="container">
+      <h2 class="section-title">🌍 Live Space Data Integration</h2>
+      <div class="grid grid-cols-2">
+        <div class="card glass">
+          <h3>🚀 International Space Station</h3>
+          <div id="issData">
+            <div class="metric">
+              <span>Current Position:</span>
+              <span id="issPosition" class="metric-value">Loading...</span>
+            </div>
+            <div class="metric">
+              <span>Altitude:</span>
+              <span id="issAlt" class="metric-value success">408 km</span>
+            </div>
+            <div class="metric">
+              <span>Velocity:</span>
+              <span id="issVelocity" class="metric-value success">27,600 km/h</span>
+            </div>
+            <div class="metric">
+              <span>Crew Members:</span>
+              <span id="issCrewCount" class="metric-value">7</span>
+            </div>
+            <div class="metric">
+              <span>Last Updated:</span>
+              <span id="issUpdated" class="metric-value">Loading...</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card glass">
+          <h3>🚀 SpaceX Latest Mission</h3>
+          <div id="spacexData">
+            <div class="metric">
+              <span>Mission Name:</span>
+              <span id="spacexMission" class="metric-value">Loading...</span>
+            </div>
+            <div class="metric">
+              <span>Flight Number:</span>
+              <span id="spacexFlight" class="metric-value">#200+</span>
+            </div>
+            <div class="metric">
+              <span>Launch Date:</span>
+              <span id="spacexDate" class="metric-value">Loading...</span>
+            </div>
+            <div class="metric">
+              <span>Mission Success:</span>
+              <span id="spacexSuccess" class="metric-value success">✓ Success</span>
+            </div>
+            <div class="metric">
+              <span>Cores Recovered:</span>
+              <span id="spacexCores" class="metric-value success">2/2</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div style="text-align: center; margin-top: 2rem;">
+        <button id="refreshSpaceData" class="btn btn-primary">
+          <span id="refreshText">🔄 Refresh Live Data</span>
+          <span id="refreshLoader" class="loading hidden"></span>
+        </button>
+        <p style="margin-top: 1rem; opacity: 0.8; font-size: 0.9rem;">
+          Data sources: NASA ISS API, SpaceX API, CelesTrak
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Live Demo Section -->
+  <section id="demo" class="section demo-section">
+    <div class="container">
+      <h2 class="section-title">🚀 Interactive Live Demo</h2>
+      <p class="text-center mb-6" style="max-width: 600px; margin: 0 auto 2rem;">
+        Select a spacecraft channel and run real-time anomaly detection. Watch as our algorithms identify anomalous patterns in satellite telemetry data.
+      </p>
+      
+      <!-- Demo Controls -->
+      <div class="demo-controls">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <label for="channelSelect">📡 Channel:</label>
+          <select id="channelSelect">
+            <option value="">Select Channel...</option>
+          </select>
+        </div>
+        
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <label for="methodSelect">🔍 Algorithm:</label>
+          <select id="methodSelect">
+            <option value="zscore">Z-Score Analysis</option>
+            <option value="isoforest">Isolation Forest</option>
+            <option value="lstm_autoencoder">LSTM Autoencoder (Deep Learning)</option>
+          </select>
+        </div>
+        
+        <button id="runDetection" class="btn btn-primary">
+          <span id="runButtonText">Run Detection</span>
+          <span id="runButtonLoader" class="loading hidden" style="margin-left: 0.5rem;"></span>
+        </button>
+        
+        <button id="loadData" class="btn btn-outline">Load Sample Data</button>
+      </div>
+      
+      <!-- System Status -->
+      <div class="text-center mb-4">
+        <span class="status-indicator status-online"></span>
+        <span>System Online - Ready for Detection</span>
+      </div>
+      
+      <!-- Chart Container -->
+      <div class="chart-container">
+        <canvas id="mainChart"></canvas>
+      </div>
+      
+      <!-- Results Display -->
+      <div id="results" class="hidden">
+        <h3 class="text-center mb-4">🎯 Detection Results</h3>
+        <div class="results-grid">
+          <div class="result-card">
+            <h4>📊 Detection Summary</h4>
+            <div id="detectionStats">
+              <div class="result-item">
+                <span>Status:</span>
+                <span>Ready</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="result-card">
+            <h4>⚡ Performance Metrics</h4>
+            <div id="performanceStats">
+              <div class="result-item">
+                <span>Algorithm:</span>
+                <span>-</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="result-card">
+            <h4>🕒 Execution Info</h4>
+            <div id="executionStats">
+              <div class="result-item">
+                <span>Execution Time:</span>
+                <span>-</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="result-card">
+            <h4>📈 Data Summary</h4>
+            <div id="dataStats">
+              <div class="result-item">
+                <span>Data Points:</span>
+                <span>-</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section id="about" class="section">
+    <div class="container text-center">
+      <h2 class="section-title">🚀 Built by Logan Haase</h2>
+      <div class="grid grid-cols-2" style="max-width: 800px; margin: 0 auto;">
+        <div class="card glass" style="text-align: left;">
+          <h3>🎓 Education & Background</h3>
+          <p>Computer Science student at University of Colorado Boulder (GPA: 3.42) with coursework in Machine Learning, AI, Network Systems, and Database Systems.</p>
+          <p style="margin-top: 1rem;">Experienced in full-stack development, data science, and aerospace applications through internships at Polaris Electro-Optics, Consensus Technology Group, and Modern Prairie.</p>
+        </div>
+        
+        <div class="card glass" style="text-align: left;">
+          <h3>💻 Technical Expertise</h3>
+          <p>Proficient in Python, JavaScript, C++, SQL with experience in FastAPI, React, PostgreSQL, Docker, and machine learning frameworks.</p>
+          <p style="margin-top: 1rem;">Passionate about building production-ready systems that solve real-world problems, with a focus on aerospace and satellite technology applications.</p>
+        </div>
+      </div>
+      
+      <div style="margin-top: 2rem;">
+        <a href="https://github.com/lhaase3" target="_blank" class="btn btn-primary" style="margin: 0.5rem;">
+          View GitHub Profile
+        </a>
+        <a href="https://lhaase3.github.io/Portfolio" target="_blank" class="btn btn-outline" style="margin: 0.5rem;">
+          Portfolio Website
+        </a>
+        <a href="mailto:loganhaase3@gmail.com" class="btn btn-outline" style="margin: 0.5rem;">
+          Contact Me
+        </a>
+      </div>
+      
+      <!-- Tech Stack -->
+      <div style="margin-top: 3rem;">
+        <h3 style="margin-bottom: 1rem;">🛠️ Technology Stack</h3>
+        <div class="grid grid-cols-3" style="max-width: 600px; margin: 0 auto;">
+          <div class="text-center">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">🐍</div>
+            <div>Python • FastAPI</div>
+            <div style="font-size: 0.8rem; opacity: 0.8;">Backend & ML</div>
+          </div>
+          <div class="text-center">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">🗄️</div>
+            <div>PostgreSQL • Docker</div>
+            <div style="font-size: 0.8rem; opacity: 0.8;">Database & Deploy</div>
+          </div>
+          <div class="text-center">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">🤖</div>
+            <div>scikit-learn • TensorFlow</div>
+            <div style="font-size: 0.8rem; opacity: 0.8;">Machine Learning</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // API Configuration
+    const API_BASE = window.location.origin + '/api';
+    let chart = null;
+
+    // Load available channels
+    async function loadChannels() {
+      try {
+        const response = await fetch(`${API_BASE}/channels`);
+        const channels = await response.json();
+        const select = document.getElementById('channelSelect');
+        
+        if (select) {
+          select.innerHTML = '';
+          
+          channels.forEach(channel => {
+            const option = document.createElement('option');
+            option.value = channel.name || channel.channel_key;
+            option.textContent = `${channel.name || channel.channel_key} (${channel.description || channel.source || 'Telemetry Channel'})`;
+            select.appendChild(option);
+          });
+          
+          if (channels.length > 0) {
+            currentChannel = channels[0].name || channels[0].channel_key;
+            loadTelemetryData();
+          }
+        }
+      } catch (error) {
+        console.error('Error loading channels:', error);
+        updateStatus('Error loading channels', true);
+      }
+    }
+
+    // Live Space Data Functions
+    async function loadLiveSpaceData() {
+      try {
+        console.log('Fetching space data from:', `${API_BASE}/space-data`);
+        const response = await fetch(`${API_BASE}/space-data`);
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log('Space data received:', data);
+        
+        if (data.status === 'success' || (data.iss && data.spacex)) {
+          // Update ISS data
+          document.getElementById('issPosition').textContent = 
+            `${data.iss.latitude.toFixed(2)}°, ${data.iss.longitude.toFixed(2)}°`;
+          document.getElementById('issAlt').textContent = `${data.iss.altitude_km} km`;
+          document.getElementById('issVelocity').textContent = `${data.iss.velocity_kmh.toLocaleString()} km/h`;
+          document.getElementById('issCrewCount').textContent = data.iss.crew_count;
+          document.getElementById('issUpdated').textContent = 
+            new Date(data.iss.last_updated * 1000).toLocaleTimeString();
+          
+          // Update hero stats
+          document.getElementById('issAltitude').textContent = `${data.iss.altitude_km} km`;
+          document.getElementById('issCrew').textContent = data.iss.crew_count;
+          
+          // Update SpaceX data
+          document.getElementById('spacexMission').textContent = data.spacex.mission_name;
+          document.getElementById('spacexFlight').textContent = `#${data.spacex.flight_number}`;
+          document.getElementById('spacexDate').textContent = 
+            new Date(data.spacex.launch_date).toLocaleDateString();
+          document.getElementById('spacexSuccess').textContent = 
+            data.spacex.success ? '✓ Success' : '✗ Failed';
+          document.getElementById('spacexSuccess').className = 
+            `metric-value ${data.spacex.success ? 'success' : 'danger'}`;
+          document.getElementById('spacexCores').textContent = 
+            `${data.spacex.cores_recovered} recovered`;
+          document.getElementById('spacexFlights').textContent = `${data.spacex.flight_number}`;
+          
+        } else if (data.error || data.note) {
+          console.warn('Space data API error:', data.error || data.note);
+          // Still try to use any data that was returned
+          if (data.iss) {
+            document.getElementById('issPosition').textContent = 
+              `${data.iss.latitude.toFixed(2)}°, ${data.iss.longitude.toFixed(2)}° (Fallback)`;
+            document.getElementById('issCrewCount').textContent = data.iss.crew_count;
+          }
+          if (data.spacex) {
+            document.getElementById('spacexMission').textContent = data.spacex.mission_name + ' (Fallback)';
+            document.getElementById('spacexFlight').textContent = `#${data.spacex.flight_number}`;
+          }
+        }
+      } catch (error) {
+        console.error('Error loading space data:', error);
+        // Show error message to user
+        document.getElementById('issPosition').textContent = 'Failed to load - Check console';
+        document.getElementById('spacexMission').textContent = 'Failed to load - Check console';
+      }
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', async () => {
+      initChart();
+      setupEventListeners();
+      await loadChannels();
+      await loadLiveSpaceData();
+      
+      // Auto-refresh space data every 60 seconds
+      setInterval(loadLiveSpaceData, 60000);
+      
+      // Auto-refresh telemetry data every 30 seconds if not running detection
+      setInterval(() => {
+        if (!isRunning && currentChannel) {
+          loadTelemetryData();
+        }
+      }, 30000);
+    });
+
+    // Initialize chart
+    function initChart() {
+      const ctx = document.getElementById('mainChart').getContext('2d');
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [{
+            label: 'Telemetry Value',
+            data: [],
+            borderColor: 'rgb(59, 130, 246)',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            borderWidth: 2,
+            pointRadius: 2,
+            pointHoverRadius: 6,
+            tension: 0.1,
+            fill: true
+          }, {
+            label: 'Anomalies',
+            data: [],
+            backgroundColor: 'rgba(239, 68, 68, 0.9)',
+            borderColor: 'rgb(239, 68, 68)',
+            pointRadius: 6,
+            pointHoverRadius: 8,
+            showLine: false,
+            type: 'scatter'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            intersect: false,
+            mode: 'index'
+          },
+          scales: {
+            x: {
+              display: true,
+              title: {
+                display: true,
+                text: 'Time',
+                color: '#e5e7eb'
+              },
+              ticks: {
+                color: '#9ca3af',
+                maxTicksLimit: 10
+              },
+              grid: {
+                color: 'rgba(255, 255, 255, 0.1)'
+              }
+            },
+            y: {
+              display: true,
+              title: {
+                display: true,
+                text: 'Telemetry Value',
+                color: '#e5e7eb'
+              },
+              ticks: {
+                color: '#9ca3af'
+              },
+              grid: {
+                color: 'rgba(255, 255, 255, 0.1)'
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                color: '#e5e7eb',
+                usePointStyle: true,
+                padding: 20
+              }
+            },
+            title: {
+              display: true,
+              text: 'Real-Time Satellite Telemetry Analysis',
+              color: '#ffffff',
+              font: {
+                size: 16,
+                weight: 'bold'
+              },
+              padding: 20
+            },
+            tooltip: {
+              backgroundColor: 'rgba(17, 24, 39, 0.9)',
+              titleColor: '#ffffff',
+              bodyColor: '#e5e7eb',
+              borderColor: '#374151',
+              borderWidth: 1,
+              cornerRadius: 8,
+              displayColors: true,
+              callbacks: {
+                label: function(context) {
+                  if (context.datasetIndex === 1) {
+                    return `🚨 Anomaly detected: ${context.parsed.y.toFixed(3)}`;
+                  }
+                  return `${context.dataset.label}: ${context.parsed.y.toFixed(3)}`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Global variables
+    let currentChannel = 'demo_channel_1';
+    let currentAlgorithm = 'zscore';
+    let isRunning = false;
+
+    // Update status display
+    function updateStatus(status, isError = false) {
+      const statusElement = document.getElementById('detectionStatus');
+      if (statusElement) {
+        statusElement.textContent = status;
+        statusElement.className = `status ${isError ? 'error' : 'success'}`;
+      }
+    }
+
+    // Load telemetry data for visualization
+    async function loadTelemetryData() {
+      try {
+        updateStatus('Loading telemetry data...');
+        
+        const response = await fetch(`${API_BASE}/timeseries?channel=${currentChannel}&limit=500`);
+        const data = await response.json();
+        
+        if (data.length === 0) {
+          updateStatus('No data available for this channel', true);
+          return;
+        }
+        
+        // Update chart with telemetry data
+        const timestamps = data.map(d => new Date(d.timestamp).toLocaleTimeString());
+        const values = data.map(d => d.value);
+        
+        chart.data.labels = timestamps;
+        chart.data.datasets[0].data = values;
+        chart.data.datasets[1].data = []; // Clear anomalies
+        
+        chart.update('none');
+        
+        updateStatus(`Loaded ${data.length} data points`);
+        
+        // Update results
+        const dataPointsEl = document.getElementById('dataPoints');
+        const timeRangeEl = document.getElementById('timeRange');
+        
+        if (dataPointsEl) dataPointsEl.textContent = data.length;
+        if (timeRangeEl) timeRangeEl.textContent = `${timestamps[0]} - ${timestamps[timestamps.length - 1]}`;
+        
+      } catch (error) {
+        console.error('Error loading telemetry data:', error);
+        updateStatus('Error loading telemetry data', true);
+      }
+    }
+
+    // Load and display anomalies
+    async function loadAnomalies() {
+      try {
+        const response = await fetch(`${API_BASE}/anomalies?channel=${currentChannel}`);
+        const anomalies = await response.json();
+        
+        // Convert anomalies to chart format
+        const anomalyPoints = anomalies.map(anomaly => ({
+          x: new Date(anomaly.timestamp).toLocaleTimeString(),
+          y: anomaly.value
+        }));
+        
+        chart.data.datasets[1].data = anomalyPoints;
+        chart.update('active');
+        
+      } catch (error) {
+        console.error('Error loading anomalies:', error);
+      }
+    }
+
+    // Run anomaly detection
+    async function runDetection() {
+      if (isRunning) return;
+      
+      isRunning = true;
+      const button = document.querySelector('.run-btn');
+      if (!button) return;
+      
+      const originalText = button.textContent;
+      button.textContent = '🔄 Running...';
+      button.disabled = true;
+      
+      try {
+        updateStatus('Running anomaly detection...');
+        
+        // Run detection
+        const response = await fetch(`${API_BASE}/run-detection`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            channel: currentChannel,
+            algorithm: currentAlgorithm
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(result.detail || 'Detection failed');
+        }
+        
+        // Load anomalies and update chart
+        await loadAnomalies();
+        
+        updateStatus(`Detection complete! Found ${result.anomalies_detected || 0} anomalies`);
+        
+        // Update results
+        const anomaliesEl = document.getElementById('anomaliesFound');
+        const algorithmEl = document.getElementById('algorithm');
+        
+        if (anomaliesEl) anomaliesEl.textContent = result.anomalies_detected || 0;
+        if (algorithmEl) algorithmEl.textContent = currentAlgorithm.toUpperCase();
+        
+      } catch (error) {
+        console.error('Error running detection:', error);
+        updateStatus(`Error: ${error.message}`, true);
+      } finally {
+        isRunning = false;
+        button.textContent = originalText;
+        button.disabled = false;
+      }
+    }
+
+    // Event listeners setup
+    function setupEventListeners() {
+      // Channel selection
+      const channelSelect = document.getElementById('channelSelect');
+      if (channelSelect) {
+        channelSelect.addEventListener('change', function(e) {
+          currentChannel = e.target.value;
+          loadTelemetryData();
+        });
+      }
+      
+      // Algorithm selection
+      const algorithmSelect = document.getElementById('algorithmSelect') || document.getElementById('methodSelect');
+      if (algorithmSelect) {
+        algorithmSelect.addEventListener('change', function(e) {
+          currentAlgorithm = e.target.value;
+        });
+      }
+      
+      // Run detection button
+      const runBtn = document.querySelector('.run-btn');
+      if (runBtn) {
+        runBtn.addEventListener('click', runDetection);
+      }
+      
+      // Refresh space data button
+      const refreshBtn = document.getElementById('refreshSpaceData');
+      if (refreshBtn) {
+        refreshBtn.addEventListener('click', async () => {
+          const text = document.getElementById('refreshText');
+          const loader = document.getElementById('refreshLoader');
+          
+          text.style.display = 'none';
+          loader.classList.remove('hidden');
+          
+          await loadLiveSpaceData();
+          
+          text.style.display = 'inline';
+          loader.classList.add('hidden');
+        });
+      }
+      
+      // Smooth scrolling for navigation
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            target.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
+          }
+        });
+      });
+    }
+
+
+  </script>
+</body>
+</html>

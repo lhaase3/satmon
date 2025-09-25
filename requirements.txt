@@ -13,3 +13,32 @@ seaborn
 tensorflow
 joblib
 websockets
+
+# Enhanced Database Support
+asyncpg==0.29.0
+timescaledb==0.0.4
+
+# Advanced ML Models
+torch==2.1.0
+transformers==4.35.0
+
+# Real-time Processing
+redis==5.0.1
+celery==5.3.4
+
+# Monitoring & Observability
+prometheus-client==0.19.0
+structlog==23.2.0
+
+# Security
+cryptography==41.0.8
+python-jose[cryptography]==3.3.0
+
+# API Documentation
+mkdocs==1.5.3
+mkdocs-material==9.4.8
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+httpx==0.25.2

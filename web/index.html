@@ -353,7 +353,7 @@
 
   <script>
     // API Configuration
-    const API_BASE = window.location.origin;
+    const API_BASE = window.location.origin + '/api';
     let chart = null;
 
     // Load available channels
@@ -400,7 +400,7 @@
 
     // Initialize chart
     function initChart() {
-      const ctx = document.getElementById('telemetryChart').getContext('2d');
+      const ctx = document.getElementById('mainChart').getContext('2d');
       chart = new Chart(ctx, {
         type: 'line',
         data: {
