@@ -52,7 +52,7 @@ jobs:
       run: safety check --json --output safety-report.json
     
     - name: Upload security reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: security-reports
@@ -110,7 +110,7 @@ jobs:
       run: python scripts/monitoring.py
     
     - name: Upload test artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: test-results-${{ matrix.python-version }}
@@ -149,7 +149,7 @@ jobs:
       run: docker save satmon:latest | gzip > satmon-docker-image.tar.gz
     
     - name: Upload Docker artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: docker-image
         path: satmon-docker-image.tar.gz
@@ -166,7 +166,7 @@ jobs:
     - uses: actions/checkout@v4
     
     - name: Download Docker image
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: docker-image
     
@@ -202,7 +202,7 @@ jobs:
     - uses: actions/checkout@v4
     
     - name: Download Docker image
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: docker-image
     
@@ -338,7 +338,7 @@ jobs:
         "
     
     - name: Upload performance metrics
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: performance-metrics
         path: performance_metrics.json

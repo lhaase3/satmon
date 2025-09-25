@@ -1,10 +1,8 @@
 {
   "build": {
-    "builder": "nixpacks"
+    "builder": "dockerfile"
   },
   "deploy": {
-    "startCommand": "python demo_server.py",
-    "healthcheckPath": "/health",
-    "restartPolicyType": "on-failure"
+    "startCommand": "python demo_server.py"
   }
 }
