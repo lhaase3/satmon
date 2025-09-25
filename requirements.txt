@@ -10,3 +10,6 @@ scikit-learn
 requests
 matplotlib
 seaborn
+tensorflow
+joblib
+websockets
