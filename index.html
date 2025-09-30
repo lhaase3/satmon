@@ -12,8 +12,8 @@
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3"></script>
   
   <!-- Three.js for 3D Globe -->
-  <script src="https://cdn.jsdelivr.net/npm/three@0.155.0/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.155.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   
   <!-- Custom styles -->
   <link rel="stylesheet" href="/static/styles.css">
@@ -1068,8 +1068,20 @@
     function initGlobe() {
       if (isGlobeInitialized) return;
 
-      const container = document.getElementById('globeContainer');
-      if (!container) return;
+      const container = document.getElementById('globe-container');
+      if (!container) {
+        console.error('Globe container not found');
+        return;
+      }
+
+      // Check if Three.js is loaded
+      if (typeof THREE === 'undefined') {
+        console.error('Three.js not loaded');
+        setTimeout(initGlobe, 500);
+        return;
+      }
+
+      console.log('Initializing 3D globe...');
 
       // Scene setup
       globeScene = new THREE.Scene();
@@ -1080,12 +1092,16 @@
       container.appendChild(globeRenderer.domElement);
 
       // Controls
-      controls = new THREE.OrbitControls(globeCamera, globeRenderer.domElement);
-      controls.enableDamping = true;
-      controls.dampingFactor = 0.05;
-      controls.screenSpacePanning = false;
-      controls.minDistance = 3;
-      controls.maxDistance = 10;
+      if (THREE.OrbitControls) {
+        controls = new THREE.OrbitControls(globeCamera, globeRenderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.screenSpacePanning = false;
+        controls.minDistance = 3;
+        controls.maxDistance = 10;
+      } else {
+        console.warn('OrbitControls not available');
+      }
 
       // Lighting
       const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
@@ -1142,6 +1158,14 @@
       globeCamera.position.set(0, 0, 5);
 
       isGlobeInitialized = true;
+      console.log('3D globe initialized successfully');
+      
+      // Hide loading message
+      const loadingMsg = document.getElementById('loading-globe');
+      if (loadingMsg) {
+        loadingMsg.style.display = 'none';
+      }
+      
       updateISSPosition();
       animate3DGlobe();
     }
@@ -1160,15 +1184,18 @@
       iss.position.y = (radius * Math.cos(phi));
 
       // Update ISS info overlay
-      const overlay = document.getElementById('issInfoOverlay');
-      if (overlay) {
-        overlay.innerHTML = `
-          <div><strong>ISS Position</strong></div>
-          <div>Lat: ${issPosition.lat.toFixed(2)}°</div>
-          <div>Lng: ${issPosition.lng.toFixed(2)}°</div>
-          <div>Alt: ${issPosition.altitude} km</div>
-          <div>Speed: 27,600 km/h</div>
-        `;
+      const posElement = document.getElementById('globe-iss-pos');
+      const altElement = document.getElementById('globe-iss-alt');
+      const velElement = document.getElementById('globe-iss-vel');
+      
+      if (posElement) {
+        posElement.textContent = `${issPosition.lat.toFixed(2)}°, ${issPosition.lng.toFixed(2)}°`;
+      }
+      if (altElement) {
+        altElement.textContent = `${issPosition.altitude} km`;
+      }
+      if (velElement) {
+        velElement.textContent = `27,600 km/h`;
       }
 
       if (followISS && controls) {
@@ -1194,17 +1221,17 @@
 
     function toggleGlobeRotation() {
       globeAnimationRunning = !globeAnimationRunning;
-      const button = document.querySelector('[onclick="toggleGlobeRotation()"]');
+      const button = document.getElementById('toggle-rotation');
       if (button) {
-        button.textContent = globeAnimationRunning ? 'Pause Rotation' : 'Resume Rotation';
+        button.innerHTML = globeAnimationRunning ? '⏸️ Pause' : '▶️ Resume';
       }
     }
 
     function toggleFollowISS() {
       followISS = !followISS;
-      const button = document.querySelector('[onclick="toggleFollowISS()"]');
+      const button = document.getElementById('follow-iss');
       if (button) {
-        button.textContent = followISS ? 'Stop Following ISS' : 'Follow ISS';
+        button.innerHTML = followISS ? '🔓 Unfollow ISS' : '🎯 Follow ISS';
       }
       
       if (!followISS && controls) {
@@ -1225,6 +1252,18 @@
     // Initialize globe when page loads
     document.addEventListener('DOMContentLoaded', function() {
       setTimeout(initGlobe, 1000); // Delay to ensure Three.js is loaded
+      
+      // Add button event listeners
+      const toggleRotationBtn = document.getElementById('toggle-rotation');
+      const followISSBtn = document.getElementById('follow-iss');
+      
+      if (toggleRotationBtn) {
+        toggleRotationBtn.addEventListener('click', toggleGlobeRotation);
+      }
+      
+      if (followISSBtn) {
+        followISSBtn.addEventListener('click', toggleFollowISS);
+      }
     });
 
 
