@@ -19,13 +19,17 @@
   <link rel="stylesheet" href="/static/styles.css">
   
   <!-- Favicon -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛰️</text></svg>">
+  <link rel="icon" href="/static/images/satmon-logo.png" type="image/png">
+  <link rel="apple-touch-icon" href="/static/images/satmon-logo.png">
 </head>
 <body>
   <!-- Navigation -->
   <nav class="navbar">
     <div class="nav-container">
-      <div class="logo">🛰️ SatMon</div>
+      <div class="logo">
+        <img src="/static/images/satmon-logo.png" alt="SatMon" style="height: 2rem; vertical-align: middle; margin-right: 0.5rem;">
+        SatMon
+      </div>
       <ul class="nav-links">
         <li><a href="#home">Home</a></li>
         <li><a href="#demo">Live Demo</a></li>
@@ -332,7 +336,10 @@
             
             <!-- ISS Info Overlay -->
             <div id="iss-info" style="position: absolute; top: 1rem; left: 1rem; background: rgba(0, 0, 0, 0.8); padding: 1rem; border-radius: 8px; color: white; font-size: 0.9rem; backdrop-filter: blur(10px);">
-              <div style="font-weight: bold; margin-bottom: 0.5rem;">🛰️ ISS Status</div>
+              <div style="font-weight: bold; margin-bottom: 0.5rem;">
+                <img src="/static/images/satmon-logo.png" alt="Satellite" style="height: 1rem; vertical-align: middle; margin-right: 0.25rem;">
+                ISS Status
+              </div>
               <div>Position: <span id="globe-iss-pos">Loading...</span></div>
               <div>Altitude: <span id="globe-iss-alt">408 km</span></div>
               <div>Velocity: <span id="globe-iss-vel">27,600 km/h</span></div>
@@ -356,7 +363,7 @@
       
       <div style="text-align: center;">
         <p style="opacity: 0.8; font-size: 0.9rem;">
-          🌍 Interactive 3D Earth • 🛰️ Live ISS Tracking • 🎮 Mouse to rotate and zoom
+          🌍 Interactive 3D Earth • <img src="/static/images/satmon-logo.png" alt="Satellite" style="height: 1rem; vertical-align: middle;"> Live ISS Tracking • 🎮 Mouse to rotate and zoom
         </p>
       </div>
     </div>
