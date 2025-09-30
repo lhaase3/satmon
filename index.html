@@ -11,6 +11,10 @@
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3"></script>
   
+  <!-- Three.js for 3D Globe -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.155.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.155.0/examples/js/controls/OrbitControls.js"></script>
+  
   <!-- Custom styles -->
   <link rel="stylesheet" href="/static/styles.css">
   
@@ -39,18 +43,22 @@
       <p>Production-ready ML system for detecting spacecraft anomalies using NASA-style telemetry data. Built with FastAPI, PostgreSQL, and advanced machine learning algorithms.</p>
       
       <!-- Live Space Data Stats -->
-      <div class="grid grid-cols-3" style="max-width: 600px; margin: 2rem auto;" id="liveStats">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 2rem; max-width: 900px; margin: 2rem auto; padding: 1.5rem; background: rgba(255, 255, 255, 0.05); border-radius: 12px; backdrop-filter: blur(10px);" id="liveStats">
         <div class="text-center">
           <div class="text-2xl font-bold text-green-400" id="issAltitude">408 km</div>
-          <div class="text-sm">ISS Altitude</div>
+          <div class="text-sm opacity-80">ISS Altitude</div>
         </div>
         <div class="text-center">
           <div class="text-2xl font-bold text-blue-400" id="issCrew">7</div>
-          <div class="text-sm">Crew Aboard</div>
+          <div class="text-sm opacity-80">Crew Aboard</div>
         </div>
         <div class="text-center">
-          <div class="text-2xl font-bold text-yellow-400" id="spacexFlights">200+</div>
-          <div class="text-sm">SpaceX Flights</div>
+          <div class="text-2xl font-bold text-yellow-400" id="spacexFlights">251</div>
+          <div class="text-sm opacity-80">SpaceX Flights</div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-bold text-red-400" id="marsSol">Sol 950</div>
+          <div class="text-sm opacity-80">Mars Mission</div>
         </div>
       </div>
       
@@ -86,10 +94,10 @@
           <h3>📈 Performance Metrics</h3>
           <p>Comprehensive evaluation framework with precision, recall, F1-scores, and window-based overlap detection for rigorous performance analysis.</p>
         </div>
-        <!-- <div class="card glass">
+        <div class="card glass">
           <h3>🚀 Deployment Ready</h3>
           <p>Fully containerized with Docker Compose, environment configuration, health checks, and automated data loading for production deployment.</p>
-        </div> -->
+        </div>
       </div>
     </div>
   </section>
@@ -208,7 +216,7 @@
   <section class="section" style="background: var(--gray-800);">
     <div class="container">
       <h2 class="section-title">🌍 Live Space Data Integration</h2>
-      <div class="grid grid-cols-2">
+      <div class="grid grid-cols-3">
         <div class="card glass">
           <h3><img src="/static/icons/space-station.svg" alt="International Space Station" style="width: 24px; height: 24px; display: inline-block; margin-right: 8px; vertical-align: middle;"> International Space Station</h3>
           <div id="issData">
@@ -260,6 +268,36 @@
             </div>
           </div>
         </div>
+        
+        <div class="card glass">
+          <h3>🔴 Mars Perseverance Rover</h3>
+          <div id="marsData">
+            <div class="metric">
+              <span>Mission Sol:</span>
+              <span id="marsSol" class="metric-value">Loading...</span>
+            </div>
+            <div class="metric">
+              <span>Earth Date:</span>
+              <span id="marsEarthDate" class="metric-value">Loading...</span>
+            </div>
+            <div class="metric">
+              <span>Status:</span>
+              <span id="marsStatus" class="metric-value success">Active</span>
+            </div>
+            <div class="metric">
+              <span>Mission Duration:</span>
+              <span id="marsDuration" class="metric-value">1,317 days</span>
+            </div>
+            <div class="metric">
+              <span>Samples Collected:</span>
+              <span id="marsSamples" class="metric-value success">24</span>
+            </div>
+            <div class="metric">
+              <span>Recent Photos:</span>
+              <span id="marsPhotos" class="metric-value">15</span>
+            </div>
+          </div>
+        </div>
       </div>
       
       <div style="text-align: center; margin-top: 2rem;">
@@ -268,7 +306,54 @@
           <span id="refreshLoader" class="loading hidden"></span>
         </button>
         <p style="margin-top: 1rem; opacity: 0.8; font-size: 0.9rem;">
-          Data sources: NASA ISS API, SpaceX API, CelesTrak
+          Data sources: NASA ISS API, SpaceX API, NASA Mars Photos API
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3D ISS Globe Visualization -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">🌍 Live ISS Orbit Tracker</h2>
+      <p class="text-center" style="max-width: 700px; margin: 0 auto 2rem; opacity: 0.9;">
+        Real-time 3D visualization of the International Space Station orbiting Earth. Interactive globe showing current ISS position, orbital path, and ground track.
+      </p>
+      
+      <div style="display: flex; justify-content: center; margin-bottom: 2rem;">
+        <div class="card glass" style="max-width: 800px; width: 100%;">
+          <div style="position: relative;">
+            <!-- 3D Globe Container -->
+            <div id="globe-container" style="width: 100%; height: 500px; background: linear-gradient(45deg, #0f1419, #1a2332); border-radius: 12px; overflow: hidden; position: relative;">
+              <div id="loading-globe" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 1.1rem;">
+                🌍 Loading Earth...
+              </div>
+            </div>
+            
+            <!-- ISS Info Overlay -->
+            <div id="iss-info" style="position: absolute; top: 1rem; left: 1rem; background: rgba(0, 0, 0, 0.8); padding: 1rem; border-radius: 8px; color: white; font-size: 0.9rem; backdrop-filter: blur(10px);">
+              <div style="font-weight: bold; margin-bottom: 0.5rem;">🛰️ ISS Status</div>
+              <div>Position: <span id="globe-iss-pos">Loading...</span></div>
+              <div>Altitude: <span id="globe-iss-alt">408 km</span></div>
+              <div>Velocity: <span id="globe-iss-vel">27,600 km/h</span></div>
+            </div>
+            
+            <!-- Controls -->
+            <div style="position: absolute; bottom: 1rem; right: 1rem; display: flex; gap: 0.5rem;">
+              <button id="toggle-rotation" class="btn btn-outline" style="font-size: 0.8rem; padding: 0.5rem 1rem;">
+                ⏸️ Pause
+              </button>
+              <button id="follow-iss" class="btn btn-outline" style="font-size: 0.8rem; padding: 0.5rem 1rem;">
+                🎯 Follow ISS
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div style="text-align: center;">
+        <p style="opacity: 0.8; font-size: 0.9rem;">
+          🌍 Interactive 3D Earth • 🛰️ Live ISS Tracking • 🎮 Mouse to rotate and zoom
         </p>
       </div>
     </div>
@@ -498,8 +583,8 @@
   </style>
 
   <script>
-    // API Configuration
-    const API_BASE = window.location.origin + '/api';
+    // API Configuration - use local API server for development
+    const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3001/api' : window.location.origin + '/api';
     let chart = null;
 
     // Load available channels
@@ -571,6 +656,22 @@
             `${data.spacex.cores_recovered} recovered`;
           document.getElementById('spacexFlights').textContent = `${data.spacex.flight_number}`;
           
+          // Update Mars rover data
+          document.getElementById('marsSol').textContent = `Sol ${data.mars.sol}`;
+          document.getElementById('marsEarthDate').textContent = data.mars.earth_date;
+          document.getElementById('marsStatus').textContent = 
+            data.mars.status.charAt(0).toUpperCase() + data.mars.status.slice(1);
+          document.getElementById('marsDuration').textContent = 
+            `${data.mars.mission_duration_days.toLocaleString()} days`;
+          document.getElementById('marsSamples').textContent = data.mars.sample_count;
+          document.getElementById('marsPhotos').textContent = data.mars.total_photos;
+          
+          // Update hero Mars stat
+          document.getElementById('marsSol').textContent = `Sol ${data.mars.sol}`;
+          
+          // Update 3D globe with ISS position
+          updateISSFromLiveData(data);
+          
         } else if (data.error || data.note) {
           console.warn('Space data API error:', data.error || data.note);
           // Still try to use any data that was returned
@@ -583,12 +684,17 @@
             document.getElementById('spacexMission').textContent = data.spacex.mission_name + ' (Fallback)';
             document.getElementById('spacexFlight').textContent = `#${data.spacex.flight_number}`;
           }
+          if (data.mars) {
+            document.getElementById('marsSol').textContent = `Sol ${data.mars.sol} (Fallback)`;
+            document.getElementById('marsStatus').textContent = data.mars.status;
+          }
         }
       } catch (error) {
         console.error('Error loading space data:', error);
         // Show error message to user
         document.getElementById('issPosition').textContent = 'Failed to load - Check console';
         document.getElementById('spacexMission').textContent = 'Failed to load - Check console';
+        document.getElementById('marsSol').textContent = 'Failed to load - Check console';
       }
     }
 
@@ -948,6 +1054,175 @@
       if (event.key === 'Escape') {
         closeContactModal();
       }
+    });
+
+    // 3D ISS Globe Visualization
+    let globeScene, globeRenderer, globeCamera, earth, iss, controls;
+    let isGlobeInitialized = false;
+    let globeAnimationRunning = true;
+    let followISS = false;
+    let issPosition = { lat: 0, lng: 0, altitude: 408 };
+
+    function initGlobe() {
+      if (isGlobeInitialized) return;
+
+      const container = document.getElementById('globeContainer');
+      if (!container) return;
+
+      // Scene setup
+      globeScene = new THREE.Scene();
+      globeCamera = new THREE.PerspectiveCamera(75, 800 / 500, 0.1, 1000);
+      globeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      globeRenderer.setSize(800, 500);
+      globeRenderer.setClearColor(0x000000, 0);
+      container.appendChild(globeRenderer.domElement);
+
+      // Controls
+      controls = new THREE.OrbitControls(globeCamera, globeRenderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.screenSpacePanning = false;
+      controls.minDistance = 3;
+      controls.maxDistance = 10;
+
+      // Lighting
+      const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+      globeScene.add(ambientLight);
+      
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+      directionalLight.position.set(5, 3, 5);
+      globeScene.add(directionalLight);
+
+      // Earth
+      const earthGeometry = new THREE.SphereGeometry(2, 32, 32);
+      const earthMaterial = new THREE.MeshPhongMaterial({
+        color: 0x4A90E2,
+        transparent: true,
+        opacity: 0.8
+      });
+      earth = new THREE.Mesh(earthGeometry, earthMaterial);
+      globeScene.add(earth);
+
+      // Atmosphere glow
+      const atmosphereGeometry = new THREE.SphereGeometry(2.1, 32, 32);
+      const atmosphereMaterial = new THREE.MeshBasicMaterial({
+        color: 0x87CEEB,
+        transparent: true,
+        opacity: 0.2,
+        side: THREE.BackSide
+      });
+      const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
+      globeScene.add(atmosphere);
+
+      // ISS
+      const issGeometry = new THREE.BoxGeometry(0.05, 0.05, 0.1);
+      const issMaterial = new THREE.MeshBasicMaterial({ color: 0xFFD700 });
+      iss = new THREE.Mesh(issGeometry, issMaterial);
+      globeScene.add(iss);
+
+      // Stars background
+      const starGeometry = new THREE.BufferGeometry();
+      const starMaterial = new THREE.PointsMaterial({ color: 0xFFFFFF, size: 0.5 });
+      
+      const starVertices = [];
+      for (let i = 0; i < 1000; i++) {
+        const x = (Math.random() - 0.5) * 50;
+        const y = (Math.random() - 0.5) * 50;
+        const z = (Math.random() - 0.5) * 50;
+        starVertices.push(x, y, z);
+      }
+      
+      starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
+      const stars = new THREE.Points(starGeometry, starMaterial);
+      globeScene.add(stars);
+
+      // Position camera
+      globeCamera.position.set(0, 0, 5);
+
+      isGlobeInitialized = true;
+      updateISSPosition();
+      animate3DGlobe();
+    }
+
+    function updateISSPosition() {
+      if (!iss || !earth) return;
+
+      // Convert lat/lng to 3D coordinates
+      const phi = (90 - issPosition.lat) * (Math.PI / 180);
+      const theta = (issPosition.lng + 180) * (Math.PI / 180);
+      
+      const radius = 2.2; // Slightly above Earth surface
+      
+      iss.position.x = -(radius * Math.sin(phi) * Math.cos(theta));
+      iss.position.z = (radius * Math.sin(phi) * Math.sin(theta));
+      iss.position.y = (radius * Math.cos(phi));
+
+      // Update ISS info overlay
+      const overlay = document.getElementById('issInfoOverlay');
+      if (overlay) {
+        overlay.innerHTML = `
+          <div><strong>ISS Position</strong></div>
+          <div>Lat: ${issPosition.lat.toFixed(2)}°</div>
+          <div>Lng: ${issPosition.lng.toFixed(2)}°</div>
+          <div>Alt: ${issPosition.altitude} km</div>
+          <div>Speed: 27,600 km/h</div>
+        `;
+      }
+
+      if (followISS && controls) {
+        controls.target.copy(iss.position);
+      }
+    }
+
+    function animate3DGlobe() {
+      if (!globeRenderer || !globeScene || !globeCamera) return;
+
+      requestAnimationFrame(animate3DGlobe);
+
+      if (globeAnimationRunning && earth) {
+        earth.rotation.y += 0.005;
+      }
+
+      if (controls) {
+        controls.update();
+      }
+
+      globeRenderer.render(globeScene, globeCamera);
+    }
+
+    function toggleGlobeRotation() {
+      globeAnimationRunning = !globeAnimationRunning;
+      const button = document.querySelector('[onclick="toggleGlobeRotation()"]');
+      if (button) {
+        button.textContent = globeAnimationRunning ? 'Pause Rotation' : 'Resume Rotation';
+      }
+    }
+
+    function toggleFollowISS() {
+      followISS = !followISS;
+      const button = document.querySelector('[onclick="toggleFollowISS()"]');
+      if (button) {
+        button.textContent = followISS ? 'Stop Following ISS' : 'Follow ISS';
+      }
+      
+      if (!followISS && controls) {
+        controls.target.set(0, 0, 0);
+      }
+    }
+
+    // Update ISS position from live data
+    function updateISSFromLiveData(spaceData) {
+      if (spaceData && spaceData.iss && spaceData.iss.position) {
+        issPosition.lat = parseFloat(spaceData.iss.position.latitude);
+        issPosition.lng = parseFloat(spaceData.iss.position.longitude);
+        issPosition.altitude = 408; // ISS typical altitude
+        updateISSPosition();
+      }
+    }
+
+    // Initialize globe when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(initGlobe, 1000); // Delay to ensure Three.js is loaded
     });
 
 
