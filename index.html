@@ -57,7 +57,7 @@
           <div class="text-sm opacity-80">SpaceX Flights</div>
         </div>
         <div class="text-center">
-          <div class="text-2xl font-bold text-red-400" id="marsSol">Sol 950</div>
+          <div class="text-2xl font-bold text-red-400" id="heroMarsSol">Sol 950</div>
           <div class="text-sm opacity-80">Mars Mission</div>
         </div>
       </div>
@@ -75,27 +75,27 @@
       <h2 class="section-title">Key Features</h2>
       <div class="grid grid-cols-3">
         <div class="card glass">
-          <h3><img src="/static/icons/multi-algo.svg" alt="Multi-Algorithm" style="width: 24px; height: 24px; display: inline-block; margin-right: 8px; vertical-align: middle;"> Multi-Algorithm Detection</h3>
+          <h3>Multi-Algorithm Detection</h3>
           <p>Z-Score statistical analysis, Isolation Forest ML algorithms, and LSTM autoencoders with comprehensive performance evaluation against ground truth data.</p>
         </div>
         <div class="card glass">
-          <h3>📊 Real-Time Visualization</h3>
+          <h3>Real-Time Visualization</h3>
           <p>Interactive web dashboard with live telemetry charts, anomaly overlays, and performance metrics for comprehensive spacecraft monitoring.</p>
         </div>
         <div class="card glass">
-          <h3>🏗️ Production Architecture</h3>
+          <h3>Production Architecture</h3>
           <p>FastAPI backend, PostgreSQL time-series database, Docker containerization, REST API endpoints, and automated deployment pipeline.</p>
         </div>
         <div class="card glass">
-          <h3><img src="/static/icons/nasa-data.svg" alt="NASA-Grade Data" style="width: 24px; height: 24px; display: inline-block; margin-right: 8px; vertical-align: middle;"> NASA-Grade Data</h3>
+          <h3>NASA-Grade Data</h3>
           <p>Synthetic telemetry data that mimics real NASA JPL spacecraft patterns with realistic anomaly injection and ground truth labeling.</p>
         </div>
         <div class="card glass">
-          <h3>📈 Performance Metrics</h3>
+          <h3>Performance Metrics</h3>
           <p>Comprehensive evaluation framework with precision, recall, F1-scores, and window-based overlap detection for rigorous performance analysis.</p>
         </div>
         <div class="card glass">
-          <h3>🚀 Deployment Ready</h3>
+          <h3>Deployment Ready</h3>
           <p>Fully containerized with Docker Compose, environment configuration, health checks, and automated data loading for production deployment.</p>
         </div>
       </div>
@@ -484,7 +484,7 @@
       
       <!-- Tech Stack -->
       <div style="margin-top: 3rem;">
-        <h3 style="margin-bottom: 1rem;">🛠️ Technology Stack</h3>
+        <h3 style="margin-bottom: 1rem;">Technology Stack</h3>
         <div class="grid grid-cols-3" style="max-width: 600px; margin: 0 auto;">
           <div class="text-center">
             <div style="margin-bottom: 0.5rem;"><img src="/static/icons/python.svg" alt="Python" style="width: 32px; height: 32px;"></div>
@@ -667,7 +667,7 @@
           document.getElementById('marsPhotos').textContent = data.mars.total_photos;
           
           // Update hero Mars stat
-          document.getElementById('marsSol').textContent = `Sol ${data.mars.sol}`;
+          document.getElementById('heroMarsSol').textContent = `Sol ${data.mars.sol}`;
           
           // Update 3D globe with ISS position
           updateISSFromLiveData(data);
@@ -686,6 +686,7 @@
           }
           if (data.mars) {
             document.getElementById('marsSol').textContent = `Sol ${data.mars.sol} (Fallback)`;
+            document.getElementById('heroMarsSol').textContent = `Sol ${data.mars.sol} (Fallback)`;
             document.getElementById('marsStatus').textContent = data.mars.status;
           }
         }
@@ -695,6 +696,7 @@
         document.getElementById('issPosition').textContent = 'Failed to load - Check console';
         document.getElementById('spacexMission').textContent = 'Failed to load - Check console';
         document.getElementById('marsSol').textContent = 'Failed to load - Check console';
+        document.getElementById('heroMarsSol').textContent = 'Failed to load - Check console';
       }
     }
 
