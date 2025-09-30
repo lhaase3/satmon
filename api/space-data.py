@@ -24,10 +24,33 @@ class handler(BaseHTTPRequestHandler):
             spacex_response = urllib.request.urlopen("https://api.spacexdata.com/v4/launches/latest", timeout=5)
             spacex_data = json.loads(spacex_response.read().decode())
             
-            # NASA Mars Rovers - Perseverance latest photos
+            # NASA Mars Rovers - Perseverance data
             mars_api_key = "DEMO_KEY"  # Using demo key for public access
-            mars_response = urllib.request.urlopen(f"https://api.nasa.gov/mars-photos/api/v1/rovers/perseverance/latest_photos?api_key={mars_api_key}", timeout=8)
-            mars_data = json.loads(mars_response.read().decode())
+            try:
+                mars_response = urllib.request.urlopen(f"https://api.nasa.gov/mars-photos/api/v1/rovers/perseverance/latest_photos?api_key={mars_api_key}", timeout=8)
+                mars_data = json.loads(mars_response.read().decode())
+                
+                # Extract sol and date from latest photos
+                latest_photos = mars_data.get("latest_photos", [])
+                if latest_photos:
+                    mars_sol = latest_photos[0].get("sol", 950)
+                    mars_earth_date = latest_photos[0].get("earth_date", "2024-09-30")
+                    mars_photos_count = len(latest_photos)
+                    mars_camera = latest_photos[0].get("camera", {}).get("full_name", "MAST Camera")
+                else:
+                    # If no photos, use calculated estimates
+                    mars_sol = 950 + int((time.time() - 1727663400) / 86400)  # Estimate based on days since Sol 950
+                    mars_earth_date = "2024-09-30"
+                    mars_photos_count = 15
+                    mars_camera = "MAST Camera"
+                    
+            except Exception as mars_error:
+                print(f"Mars API error: {mars_error}")
+                # Use calculated estimates when Mars API fails
+                mars_sol = 950 + int((time.time() - 1727663400) / 86400)  # Estimate Sol progression
+                mars_earth_date = "2024-09-30"
+                mars_photos_count = 15
+                mars_camera = "MAST Camera"
             
             response_data = {
                 "timestamp": time.time(),
@@ -55,13 +78,13 @@ class handler(BaseHTTPRequestHandler):
                 },
                 "mars": {
                     "rover_name": "Perseverance",
-                    "sol": mars_data.get("latest_photos", [{}])[0].get("sol", 950) if mars_data.get("latest_photos") else 950,
-                    "earth_date": mars_data.get("latest_photos", [{}])[0].get("earth_date", "2024-09-25") if mars_data.get("latest_photos") else "2024-09-25",
+                    "sol": mars_sol,
+                    "earth_date": mars_earth_date,
                     "status": "active",
                     "landing_date": "2021-02-18",
-                    "total_photos": len(mars_data.get("latest_photos", [])),
-                    "mission_duration_days": (time.time() - 1613606400) // 86400,  # Days since landing
-                    "latest_camera": mars_data.get("latest_photos", [{}])[0].get("camera", {}).get("full_name", "MAST Camera") if mars_data.get("latest_photos") else "MAST Camera",
+                    "total_photos": mars_photos_count,
+                    "mission_duration_days": int((time.time() - 1613606400) / 86400),  # Days since landing
+                    "latest_camera": mars_camera,
                     "weather_status": "Monitoring atmospheric conditions",
                     "sample_count": 24  # Approximate samples collected
                 },
@@ -122,7 +145,7 @@ class handler(BaseHTTPRequestHandler):
                 },
                 "mars": {
                     "rover_name": "Perseverance",
-                    "sol": 950 + int((current_time - 1727663400) / 86400),  # Increment sol daily
+                    "sol": 950 + int((current_time - 1727663400) / 86400),  # Increment Sol daily from Sept 30, 2024
                     "earth_date": "2024-09-30",
                     "status": "active",
                     "landing_date": "2021-02-18",
