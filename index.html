@@ -346,6 +346,9 @@
               <button id="follow-iss" class="btn btn-outline" style="font-size: 0.8rem; padding: 0.5rem 1rem;">
                 🎯 Follow ISS
               </button>
+              <button id="reset-view" class="btn btn-outline" style="font-size: 0.8rem; padding: 0.5rem 1rem;">
+                🏠 Reset View
+              </button>
             </div>
           </div>
         </div>
@@ -1059,11 +1062,13 @@
     });
 
     // 3D ISS Globe Visualization
-    let globeScene, globeRenderer, globeCamera, earth, iss, controls;
+    let globeScene, globeRenderer, globeCamera, earth, earthClouds, iss, controls;
     let isGlobeInitialized = false;
     let globeAnimationRunning = true;
     let followISS = false;
     let issPosition = { lat: 0, lng: 0, altitude: 408 };
+    let issTrail = [];
+    let issTrailLine;
 
     function initGlobe() {
       if (isGlobeInitialized) return;
@@ -1083,12 +1088,18 @@
 
       console.log('Initializing 3D globe...');
 
-      // Scene setup
+      // Scene setup with enhanced rendering
       globeScene = new THREE.Scene();
       globeCamera = new THREE.PerspectiveCamera(75, 800 / 500, 0.1, 1000);
-      globeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      globeRenderer = new THREE.WebGLRenderer({ 
+        antialias: true, 
+        alpha: true,
+        powerPreference: "high-performance"
+      });
       globeRenderer.setSize(800, 500);
       globeRenderer.setClearColor(0x000000, 0);
+      globeRenderer.shadowMap.enabled = true;
+      globeRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
       container.appendChild(globeRenderer.domElement);
 
       // Controls
@@ -1103,23 +1114,65 @@
         console.warn('OrbitControls not available');
       }
 
-      // Lighting
-      const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+      // Lighting - Enhanced for day/night cycle
+      const ambientLight = new THREE.AmbientLight(0x404040, 0.4);
       globeScene.add(ambientLight);
       
-      const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-      directionalLight.position.set(5, 3, 5);
-      globeScene.add(directionalLight);
+      const sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
+      sunLight.position.set(5, 3, 5);
+      sunLight.castShadow = true;
+      globeScene.add(sunLight);
 
-      // Earth
-      const earthGeometry = new THREE.SphereGeometry(2, 32, 32);
+      // Earth with realistic textures
+      const earthGeometry = new THREE.SphereGeometry(2, 64, 64);
+      
+      // Load Earth texture (using a solid color with normal mapping effect)
       const earthMaterial = new THREE.MeshPhongMaterial({
-        color: 0x4A90E2,
+        color: 0x2E8B57,  // Sea green for oceans
+        shininess: 100,
         transparent: true,
-        opacity: 0.8
+        opacity: 1.0
       });
+      
+      // Add continent-like patterns using vertex colors
+      const earthColors = new Float32Array(earthGeometry.attributes.position.count * 3);
+      for (let i = 0; i < earthGeometry.attributes.position.count; i++) {
+        const vertex = new THREE.Vector3();
+        vertex.fromBufferAttribute(earthGeometry.attributes.position, i);
+        
+        // Create continent-like patterns based on vertex position
+        const isLand = (
+          Math.sin(vertex.x * 3) * Math.cos(vertex.y * 2) > 0.3 ||
+          Math.sin(vertex.z * 4) * Math.cos(vertex.x * 2) > 0.4
+        );
+        
+        if (isLand) {
+          earthColors[i * 3] = 0.4;     // R - Brown/green for land
+          earthColors[i * 3 + 1] = 0.6; // G
+          earthColors[i * 3 + 2] = 0.2; // B
+        } else {
+          earthColors[i * 3] = 0.1;     // R - Blue for oceans
+          earthColors[i * 3 + 1] = 0.3; // G
+          earthColors[i * 3 + 2] = 0.8; // B
+        }
+      }
+      
+      earthGeometry.setAttribute('color', new THREE.BufferAttribute(earthColors, 3));
+      earthMaterial.vertexColors = true;
+      
       earth = new THREE.Mesh(earthGeometry, earthMaterial);
+      earth.receiveShadow = true;
       globeScene.add(earth);
+
+      // Cloud layer
+      const cloudGeometry = new THREE.SphereGeometry(2.02, 32, 32);
+      const cloudMaterial = new THREE.MeshLambertMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.3
+      });
+      earthClouds = new THREE.Mesh(cloudGeometry, cloudMaterial);
+      globeScene.add(earthClouds);
 
       // Atmosphere glow
       const atmosphereGeometry = new THREE.SphereGeometry(2.1, 32, 32);
@@ -1132,21 +1185,75 @@
       const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
       globeScene.add(atmosphere);
 
-      // ISS
-      const issGeometry = new THREE.BoxGeometry(0.05, 0.05, 0.1);
-      const issMaterial = new THREE.MeshBasicMaterial({ color: 0xFFD700 });
-      iss = new THREE.Mesh(issGeometry, issMaterial);
+      // Enhanced ISS model
+      const issGroup = new THREE.Group();
+      
+      // Main body (larger and more detailed)
+      const issBodyGeometry = new THREE.BoxGeometry(0.12, 0.08, 0.06);
+      const issBodyMaterial = new THREE.MeshPhongMaterial({ 
+        color: 0xC0C0C0,  // Silver
+        shininess: 100
+      });
+      const issBody = new THREE.Mesh(issBodyGeometry, issBodyMaterial);
+      issGroup.add(issBody);
+      
+      // Solar panels
+      const panelGeometry = new THREE.BoxGeometry(0.25, 0.02, 0.15);
+      const panelMaterial = new THREE.MeshPhongMaterial({ 
+        color: 0x1a1a2e,  // Dark blue for solar panels
+        shininess: 80
+      });
+      
+      const leftPanel = new THREE.Mesh(panelGeometry, panelMaterial);
+      leftPanel.position.set(-0.2, 0, 0);
+      issGroup.add(leftPanel);
+      
+      const rightPanel = new THREE.Mesh(panelGeometry, panelMaterial);
+      rightPanel.position.set(0.2, 0, 0);
+      issGroup.add(rightPanel);
+      
+      // Add a small antenna
+      const antennaGeometry = new THREE.CylinderGeometry(0.005, 0.005, 0.05);
+      const antennaMaterial = new THREE.MeshBasicMaterial({ color: 0xFFD700 });
+      const antenna = new THREE.Mesh(antennaGeometry, antennaMaterial);
+      antenna.position.set(0, 0.05, 0);
+      issGroup.add(antenna);
+      
+      iss = issGroup;
       globeScene.add(iss);
+      
+      // ISS orbital trail
+      const trailGeometry = new THREE.BufferGeometry();
+      const trailMaterial = new THREE.LineBasicMaterial({ 
+        color: 0xFFD700, 
+        transparent: true, 
+        opacity: 0.6,
+        linewidth: 2
+      });
+      issTrailLine = new THREE.Line(trailGeometry, trailMaterial);
+      globeScene.add(issTrailLine);
 
-      // Stars background
+      // Enhanced starfield background
       const starGeometry = new THREE.BufferGeometry();
-      const starMaterial = new THREE.PointsMaterial({ color: 0xFFFFFF, size: 0.5 });
+      const starMaterial = new THREE.PointsMaterial({ 
+        color: 0xFFFFFF, 
+        size: 0.8,
+        transparent: true,
+        opacity: 0.8,
+        sizeAttenuation: false
+      });
       
       const starVertices = [];
-      for (let i = 0; i < 1000; i++) {
-        const x = (Math.random() - 0.5) * 50;
-        const y = (Math.random() - 0.5) * 50;
-        const z = (Math.random() - 0.5) * 50;
+      for (let i = 0; i < 2000; i++) {
+        // Create more evenly distributed stars
+        const radius = 25 + Math.random() * 25;
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        
+        const x = radius * Math.sin(phi) * Math.cos(theta);
+        const y = radius * Math.sin(phi) * Math.sin(theta);
+        const z = radius * Math.cos(phi);
+        
         starVertices.push(x, y, z);
       }
       
@@ -1177,11 +1284,37 @@
       const phi = (90 - issPosition.lat) * (Math.PI / 180);
       const theta = (issPosition.lng + 180) * (Math.PI / 180);
       
-      const radius = 2.2; // Slightly above Earth surface
+      const radius = 2.25; // Slightly above Earth surface for ISS altitude
       
-      iss.position.x = -(radius * Math.sin(phi) * Math.cos(theta));
-      iss.position.z = (radius * Math.sin(phi) * Math.sin(theta));
-      iss.position.y = (radius * Math.cos(phi));
+      const x = -(radius * Math.sin(phi) * Math.cos(theta));
+      const z = (radius * Math.sin(phi) * Math.sin(theta));
+      const y = (radius * Math.cos(phi));
+      
+      iss.position.set(x, y, z);
+      
+      // Rotate ISS to face direction of travel
+      iss.lookAt(new THREE.Vector3(0, 0, 0));
+      iss.rotateY(Math.PI / 2);
+      
+      // Update orbital trail
+      issTrail.push(new THREE.Vector3(x, y, z));
+      
+      // Keep trail to last 20 positions for performance
+      if (issTrail.length > 20) {
+        issTrail.shift();
+      }
+      
+      // Update trail line geometry
+      if (issTrail.length > 1 && issTrailLine) {
+        const trailPositions = new Float32Array(issTrail.length * 3);
+        for (let i = 0; i < issTrail.length; i++) {
+          trailPositions[i * 3] = issTrail[i].x;
+          trailPositions[i * 3 + 1] = issTrail[i].y;
+          trailPositions[i * 3 + 2] = issTrail[i].z;
+        }
+        issTrailLine.geometry.setAttribute('position', new THREE.BufferAttribute(trailPositions, 3));
+        issTrailLine.geometry.attributes.position.needsUpdate = true;
+      }
 
       // Update ISS info overlay
       const posElement = document.getElementById('globe-iss-pos');
@@ -1209,7 +1342,18 @@
       requestAnimationFrame(animate3DGlobe);
 
       if (globeAnimationRunning && earth) {
-        earth.rotation.y += 0.005;
+        // Rotate Earth (slower, more realistic)
+        earth.rotation.y += 0.002;
+        
+        // Rotate clouds slightly faster for depth effect
+        if (earthClouds) {
+          earthClouds.rotation.y += 0.003;
+        }
+        
+        // Subtle ISS rotation for realism
+        if (iss) {
+          iss.rotation.z += 0.01;
+        }
       }
 
       if (controls) {
@@ -1239,6 +1383,22 @@
       }
     }
 
+    function resetView() {
+      if (controls && globeCamera) {
+        // Reset camera position
+        globeCamera.position.set(0, 0, 5);
+        controls.target.set(0, 0, 0);
+        controls.update();
+        
+        // Stop following ISS
+        followISS = false;
+        const followButton = document.getElementById('follow-iss');
+        if (followButton) {
+          followButton.innerHTML = '🎯 Follow ISS';
+        }
+      }
+    }
+
     // Update ISS position from live data
     function updateISSFromLiveData(spaceData) {
       if (spaceData && spaceData.iss && spaceData.iss.position) {
@@ -1256,6 +1416,7 @@
       // Add button event listeners
       const toggleRotationBtn = document.getElementById('toggle-rotation');
       const followISSBtn = document.getElementById('follow-iss');
+      const resetViewBtn = document.getElementById('reset-view');
       
       if (toggleRotationBtn) {
         toggleRotationBtn.addEventListener('click', toggleGlobeRotation);
@@ -1263,6 +1424,10 @@
       
       if (followISSBtn) {
         followISSBtn.addEventListener('click', toggleFollowISS);
+      }
+      
+      if (resetViewBtn) {
+        resetViewBtn.addEventListener('click', resetView);
       }
     });
 
