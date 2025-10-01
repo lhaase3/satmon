@@ -319,43 +319,46 @@
   <!-- ML Analytics Dashboard -->
   <section class="section">
     <div class="container">
-      <h2 class="section-title">🤖 Machine Learning Analytics</h2>
+      <h2 class="section-title">🤖 Real-Time ML Analytics</h2>
       <p class="text-center" style="max-width: 700px; margin: 0 auto 2rem; opacity: 0.9;">
-        Advanced anomaly detection using multiple ML algorithms with real-time performance monitoring, confidence scoring, and feature analysis.
+        <strong>Live analysis</strong> of actual satellite telemetry data using production ML algorithms. Real Isolation Forest and Z-Score detection running on demo_temp.csv with genuine performance metrics.
       </p>
 
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-bottom: 3rem;">
         
         <!-- Model Performance Metrics -->
         <div class="card glass">
-          <h3>🎯 Model Performance</h3>
+          <h3>📊 Real Model Performance</h3>
           <div id="modelMetrics">
             <div class="metric">
               <span>Isolation Forest Accuracy:</span>
-              <span id="isoForestAccuracy" class="metric-value success">94.2%</span>
+              <span id="isoForestAccuracy" class="metric-value success">Loading...</span>
             </div>
             <div class="metric">
               <span>Z-Score Precision:</span>
-              <span id="zScorePrecision" class="metric-value success">89.7%</span>
+              <span id="zScorePrecision" class="metric-value success">Loading...</span>
             </div>
             <div class="metric">
               <span>Combined F1-Score:</span>
-              <span id="combinedF1" class="metric-value success">0.918</span>
+              <span id="combinedF1" class="metric-value success">Loading...</span>
             </div>
             <div class="metric">
               <span>False Positive Rate:</span>
-              <span id="falsePositiveRate" class="metric-value warning">2.3%</span>
+              <span id="falsePositiveRate" class="metric-value warning">Loading...</span>
             </div>
             <div class="metric">
               <span>Model Confidence:</span>
-              <span id="modelConfidence" class="metric-value success">High (0.87)</span>
+              <span id="modelConfidence" class="metric-value success">Loading...</span>
+            </div>
+            <div style="margin-top: 1rem; padding: 0.5rem; background: rgba(34, 197, 94, 0.1); border-radius: 6px; font-size: 0.8rem;" class="real-data-indicator">
+              🔄 Loading real ML analysis...
             </div>
           </div>
         </div>
 
         <!-- A/B Testing Results -->
         <div class="card glass">
-          <h3>⚖️ Algorithm A/B Testing</h3>
+          <h3>Algorithm A/B Testing</h3>
           <div id="abTestResults">
             <div style="margin-bottom: 1rem;">
               <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
@@ -394,7 +397,7 @@
 
         <!-- Real-time Anomaly Confidence -->
         <div class="card glass">
-          <h3>📊 Anomaly Confidence Scores</h3>
+          <h3>Anomaly Confidence Scores</h3>
           <div id="anomalyConfidence">
             <div class="metric">
               <span>Channel 1 (Temperature):</span>
@@ -1681,12 +1684,28 @@
         const response = await fetch(`${API_BASE}/ml-analytics`);
         const data = await response.json();
         
+        // Update data source indicator
+        const realDataIndicator = document.querySelector('.real-data-indicator');
+        if (realDataIndicator) {
+          if (data.data_source === 'real_telemetry_analysis') {
+            realDataIndicator.innerHTML = '✅ Using real ML analysis on demo_temp.csv';
+            realDataIndicator.style.background = 'rgba(34, 197, 94, 0.1)';
+          } else {
+            realDataIndicator.innerHTML = '⚠️ Fallback simulation mode';
+            realDataIndicator.style.background = 'rgba(251, 191, 36, 0.1)';
+          }
+        }
+        
         if (data.status === 'success') {
           updateMLMetricsFromAPI(data);
           updateAnomalyConfidencesFromAPI(data);
           updateFeatureImportanceFromAPI(data);
           updateABTestResultsFromAPI(data);
           updateSystemHealthFromAPI(data);
+        } else if (data.status === 'fallback_simulation') {
+          console.warn('ML Analytics using fallback simulation:', data.error);
+          // Still update with available data
+          updateMLMetricsFromAPI(data);
         }
       } catch (error) {
         console.error('Error loading ML analytics:', error);
