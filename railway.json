@@ -1,8 +1,0 @@
-{
-  "build": {
-    "builder": "dockerfile"
-  },
-  "deploy": {
-    "startCommand": "python demo_server.py"
-  }
-}
