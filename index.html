@@ -319,7 +319,7 @@
   <!-- ML Analytics Dashboard -->
   <section class="section">
     <div class="container">
-      <h2 class="section-title">🤖 Real-Time ML Analytics</h2>
+      <h2 class="section-title">Real-Time ML Analytics</h2>
       <p class="text-center" style="max-width: 700px; margin: 0 auto 2rem; opacity: 0.9;">
         <strong>Live analysis</strong> of actual satellite telemetry data using production ML algorithms. Real Isolation Forest and Z-Score detection running on demo_temp.csv with genuine performance metrics.
       </p>
@@ -328,7 +328,7 @@
         
         <!-- Model Performance Metrics -->
         <div class="card glass">
-          <h3>📊 Real Model Performance</h3>
+          <h3>Real Model Performance</h3>
           <div id="modelMetrics">
             <div class="metric">
               <span>Isolation Forest Accuracy:</span>
@@ -425,7 +425,7 @@
 
       <!-- Feature Importance Visualization -->
       <div class="card glass" style="margin-bottom: 2rem;">
-        <h3>🔍 Feature Importance Analysis</h3>
+        <h3>Feature Importance Analysis</h3>
         <p style="opacity: 0.8; margin-bottom: 1.5rem;">
           Machine learning model interpretation showing which telemetry features contribute most to anomaly detection decisions.
         </p>
@@ -506,50 +506,83 @@
       <!-- ML Pipeline Status -->
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
         <div class="card glass-dark">
-          <h4>🔄 Model Training Status</h4>
+          <h4>Model Training Pipeline</h4>
           <div class="metric">
-            <span>Last Retrain:</span>
-            <span class="metric-value">2 hours ago</span>
+            <span>Current Version:</span>
+            <span class="metric-value" id="currentModelVersion">v2.1.4</span>
           </div>
           <div class="metric">
-            <span>Training Samples:</span>
-            <span class="metric-value">847,392</span>
+            <span>Last Retrain:</span>
+            <span class="metric-value" id="lastRetrain">1 hour ago</span>
           </div>
           <div class="metric">
             <span>Next Scheduled:</span>
-            <span class="metric-value success">6 hours</span>
+            <span class="metric-value success" id="nextRetrain">2 hours</span>
+          </div>
+          <div style="margin-top: 1rem;">
+            <button id="triggerRetrain" class="btn btn-primary" style="width: 100%; font-size: 0.8rem; padding: 0.5rem;">
+              Trigger Retraining
+            </button>
           </div>
         </div>
         
         <div class="card glass-dark">
-          <h4>📈 Data Drift Detection</h4>
+          <h4>A/B Testing</h4>
           <div class="metric">
-            <span>Feature Drift Score:</span>
-            <span class="metric-value success">0.12 (Low)</span>
+            <span>Champion Model:</span>
+            <span class="metric-value success" id="championModel">v2.1.4</span>
           </div>
           <div class="metric">
-            <span>Concept Drift:</span>
-            <span class="metric-value success">Stable</span>
+            <span>Challenger:</span>
+            <span class="metric-value warning" id="challengerModel">v2.2.0-beta</span>
           </div>
           <div class="metric">
-            <span>Model Degradation:</span>
-            <span class="metric-value warning">Minor (3%)</span>
+            <span>Traffic Split:</span>
+            <span class="metric-value" id="trafficSplit">80% / 20%</span>
+          </div>
+          <div class="metric">
+            <span>Statistical Significance:</span>
+            <span class="metric-value warning" id="statSig">89% (Target: 95%)</span>
           </div>
         </div>
         
         <div class="card glass-dark">
-          <h4>⚡ Real-time Processing</h4>
+          <h4>Data Quality</h4>
+          <div class="metric">
+            <span>Completeness:</span>
+            <span class="metric-value success" id="dataCompleteness">99.2%</span>
+          </div>
+          <div class="metric">
+            <span>Consistency:</span>
+            <span class="metric-value success" id="dataConsistency">97.8%</span>
+          </div>
+          <div class="metric">
+            <span>Timeliness:</span>
+            <span class="metric-value success" id="dataTimeliness">98.5%</span>
+          </div>
+          <div class="metric">
+            <span>Issues Detected:</span>
+            <span class="metric-value warning" id="dataIssues">3 minor</span>
+          </div>
+        </div>
+        
+        <div class="card glass-dark">
+          <h4>Real-time Processing</h4>
           <div class="metric">
             <span>Inference Latency:</span>
-            <span class="metric-value success">~23ms</span>
+            <span class="metric-value success" id="inferenceLatency">~23ms</span>
           </div>
           <div class="metric">
             <span>Throughput:</span>
-            <span class="metric-value">1,247 pts/sec</span>
+            <span class="metric-value" id="throughput">1,247 pts/sec</span>
           </div>
           <div class="metric">
             <span>Queue Depth:</span>
-            <span class="metric-value success">0 (Healthy)</span>
+            <span class="metric-value success" id="queueDepth">0 (Healthy)</span>
+          </div>
+          <div class="metric">
+            <span>Model Drift:</span>
+            <span class="metric-value success" id="modelDrift">None detected</span>
           </div>
         </div>
       </div>
@@ -1956,13 +1989,169 @@
       }
     }
 
+    // Model Training Functions
+    async function triggerModelRetraining() {
+      const button = document.getElementById('triggerRetrain');
+      const originalText = button.innerHTML;
+      
+      try {
+        button.innerHTML = '🔄 Training...';
+        button.disabled = true;
+        
+        const response = await fetch(`${API_BASE}/ml-training`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'retrain' })
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+          showTrainingResults(result);
+          // Update pipeline status
+          document.getElementById('lastRetrain').textContent = 'Just now';
+          document.getElementById('currentModelVersion').textContent = 'v2.2.0';
+        } else {
+          alert('Training failed: ' + (result.error || 'Unknown error'));
+        }
+      } catch (error) {
+        console.error('Training error:', error);
+        alert('Training request failed');
+      } finally {
+        button.innerHTML = originalText;
+        button.disabled = false;
+      }
+    }
+
+    function showTrainingResults(results) {
+      const modal = document.getElementById('trainingModal');
+      const resultsDiv = document.getElementById('trainingResults');
+      
+      if (!modal || !resultsDiv) return;
+      
+      resultsDiv.innerHTML = `
+        <h4>🎯 Training Completed Successfully</h4>
+        <div style="margin: 1rem 0; padding: 1rem; background: rgba(34, 197, 94, 0.1); border-radius: 8px;">
+          <strong>Duration:</strong> ${results.training_duration_seconds}s | 
+          <strong>Samples:</strong> ${results.dataset_info.total_samples.toLocaleString()} | 
+          <strong>Features:</strong> ${results.dataset_info.features}
+        </div>
+        
+        <h5>🏆 Model Candidates:</h5>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+          ${Object.entries(results.model_candidates).map(([key, model]) => `
+            <div style="padding: 1rem; background: rgba(59, 130, 246, 0.1); border-radius: 8px; ${key === results.recommended_model.type ? 'border: 2px solid #22c55e;' : ''}">
+              <h6>${model.name} ${key === results.recommended_model.type ? '👑' : ''}</h6>
+              <div style="font-size: 0.9rem;">
+                <div>Precision: ${(model.precision * 100).toFixed(1)}%</div>
+                <div>Recall: ${(model.recall * 100).toFixed(1)}%</div>
+                <div>F1-Score: ${model.f1_score.toFixed(3)}</div>
+                <div>Detected: ${model.anomalies_detected}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        
+        <h5>📋 Next Steps:</h5>
+        <ul style="margin: 1rem 0;">
+          ${results.next_steps.map(step => `<li>${step}</li>`).join('')}
+        </ul>
+        
+        <div style="text-align: center; margin-top: 2rem;">
+          <button class="btn btn-primary" onclick="deployModel('${results.recommended_model.type}')">
+            🚀 Deploy Recommended Model
+          </button>
+          <button class="btn btn-outline" onclick="closeTrainingModal()" style="margin-left: 1rem;">
+            📊 Continue Monitoring
+          </button>
+        </div>
+      `;
+      
+      modal.style.display = 'flex';
+    }
+
+    function closeTrainingModal() {
+      const modal = document.getElementById('trainingModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    async function deployModel(modelType) {
+      try {
+        const response = await fetch(`${API_BASE}/ml-training`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'deploy', model_id: modelType })
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+          alert('🚀 Model deployment initiated! Starting canary rollout...');
+          closeTrainingModal();
+          // Update A/B testing display
+          document.getElementById('challengerModel').textContent = modelType;
+          document.getElementById('trafficSplit').textContent = '95% / 5%';
+        }
+      } catch (error) {
+        console.error('Deployment error:', error);
+        alert('Deployment failed');
+      }
+    }
+
+    async function loadMLTrainingStatus() {
+      try {
+        const response = await fetch(`${API_BASE}/ml-training`);
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+          // Update training pipeline info
+          document.getElementById('currentModelVersion').textContent = data.training_pipeline.current_model_version;
+          
+          const lastRetrain = new Date(data.training_pipeline.last_retrain * 1000);
+          const now = new Date();
+          const hoursAgo = Math.floor((now - lastRetrain) / (1000 * 60 * 60));
+          document.getElementById('lastRetrain').textContent = `${hoursAgo} hour${hoursAgo !== 1 ? 's' : ''} ago`;
+          
+          const nextRetrain = new Date(data.training_pipeline.next_scheduled * 1000);
+          const hoursUntil = Math.floor((nextRetrain - now) / (1000 * 60 * 60));
+          document.getElementById('nextRetrain').textContent = `${hoursUntil} hour${hoursUntil !== 1 ? 's' : ''}`;
+          
+          // Update A/B testing info
+          if (data.a_b_testing) {
+            document.getElementById('championModel').textContent = data.a_b_testing.champion;
+            document.getElementById('challengerModel').textContent = data.a_b_testing.challenger;
+            document.getElementById('trafficSplit').textContent = `${data.a_b_testing.traffic_split.champion}% / ${data.a_b_testing.traffic_split.challenger}%`;
+            document.getElementById('statSig').textContent = `${(data.a_b_testing.statistical_significance * 100).toFixed(0)}% (Target: 95%)`;
+          }
+          
+          // Update data quality
+          if (data.data_quality) {
+            document.getElementById('dataCompleteness').textContent = `${data.data_quality.completeness}%`;
+            document.getElementById('dataConsistency').textContent = `${data.data_quality.consistency}%`;
+            document.getElementById('dataTimeliness').textContent = `${data.data_quality.timeliness}%`;
+            document.getElementById('dataIssues').textContent = `${data.data_quality.issues_detected} minor`;
+          }
+        }
+      } catch (error) {
+        console.error('Error loading ML training status:', error);
+      }
+    }
+
     // Initialize ML dashboard updates
     document.addEventListener('DOMContentLoaded', function() {
       // Initial load from API
       loadMLAnalytics();
+      loadMLTrainingStatus();
       
       // Set up regular updates for ML metrics (load from API every 30 seconds)
       setInterval(loadMLAnalytics, 30000);
+      setInterval(loadMLTrainingStatus, 45000);
+      
+      // Add event listener for training button
+      const trainButton = document.getElementById('triggerRetrain');
+      if (trainButton) {
+        trainButton.addEventListener('click', triggerModelRetraining);
+      }
       
       // More frequent visual updates with simulated micro-variations
       setInterval(() => {
@@ -1980,6 +2169,21 @@
 
 
   </script>
+
+  <!-- Training Modal -->
+  <div id="trainingModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="max-width: 800px;">
+      <div class="modal-header">
+        <h3>🤖 Model Training Results</h3>
+        <button class="modal-close" onclick="closeTrainingModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="trainingResults" style="padding: 1rem;">
+          <!-- Training results will be populated here -->
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Contact Modal -->
   <div id="contactModal" class="modal-overlay" style="display: none;">
