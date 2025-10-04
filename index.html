@@ -980,7 +980,7 @@
       
       <div style="text-align: center;">
         <p style="opacity: 0.8; font-size: 0.9rem;">
-          🌍 Interactive 3D Earth • <img src="/static/images/satmon-logo.png" alt="Satellite" style="height: 1rem; vertical-align: middle;"> Live ISS Tracking • 🎮 Mouse to rotate and zoom
+          Interactive 3D Earth • Live ISS Tracking • Mouse to rotate and zoom
         </p>
       </div>
     </div>
@@ -1530,6 +1530,29 @@
     const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3001/api' : window.location.origin + '/api';
     let chart = null;
 
+    // Function to convert channel names to proper display format
+    function formatChannelName(channelName) {
+      const channelDisplayNames = {
+        'iss_position': 'ISS Real-Time Position',
+        'iss_altitude': 'ISS Orbital Altitude', 
+        'spacex_launches': 'SpaceX Launch Data',
+        'satellite_tle': 'Satellite Orbital Elements',
+        'demo_temp_sensor': 'Synthetic Temperature Data',
+        'demo_channel_1': 'Demo Temperature Sensor',
+        'demo_channel_2': 'Demo Pressure Sensor',
+        'demo_channel_3': 'Demo Voltage Sensor', 
+        'demo_channel_4': 'Demo Current Sensor',
+        'mars_rover': 'Mars Perseverance Rover',
+        'space_weather': 'Space Weather Data',
+        'solar_activity': 'Solar Activity Monitor'
+      };
+      
+      // Return formatted name if exists, otherwise convert underscores to spaces and title case
+      return channelDisplayNames[channelName] || 
+             channelName.replace(/_/g, ' ')
+                       .replace(/\b\w/g, l => l.toUpperCase());
+    }
+
     // Load available channels
     async function loadChannels() {
       try {
@@ -1543,7 +1566,9 @@
           channels.forEach(channel => {
             const option = document.createElement('option');
             option.value = channel.name || channel.channel_key;
-            option.textContent = `${channel.name || channel.channel_key} (${channel.description || channel.source || 'Telemetry Channel'})`;
+            const displayName = formatChannelName(channel.name || channel.channel_key);
+            const description = channel.description || channel.source || 'Telemetry Channel';
+            option.textContent = `${displayName} (${description})`;
             select.appendChild(option);
           });
           
