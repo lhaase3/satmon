@@ -1,0 +1,10 @@
+{
+  "seed": 42,
+  "channel_split_fractions": {"train": 0.6, "validation": 0.2, "test": 0.2},
+  "samples_per_monitoring_block": 1000,
+  "max_alerts_per_channel_block": 5,
+  "missed_anomaly_relative_cost": 10,
+  "primary_metric": "event_recall_at_5",
+  "primary_methods": ["rolling_3sigma", "logistic_regression", "random_forest"],
+  "status": "protocol only; no experiment runner yet"
+}

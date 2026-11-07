@@ -1,1 +1,0 @@
-web: python demo_server.py
