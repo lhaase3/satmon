@@ -80,3 +80,24 @@ The original main branch was not modified.
 - AI recorded the selected protocol and closeout notes. Before final testing,
   review the settings and reproduce the notebook in a clean kernel. Do not use
   cached earlier window-50 model objects for the selected window-100 experiment.
+
+## 2026-11-10: final evaluation and failure analysis
+
+- The student reported restarting the kernel and running all training/validation
+  cells without errors, reproducing the window-100 validation comparisons.
+- AI supplied notebook code for frozen-model test scoring, per-channel/event/alert
+  records, paired whole-channel bootstrap, spacecraft and event-type slices,
+  miss diagnostics, and failure plots. The student executed it and shared outputs.
+- Test results: baseline 17/19 events with 146 false alerts; forest 15/19 with 297;
+  Logistic Regression 13/19 with 316. Settings were not retuned after testing.
+- Bootstrap used 5,000 draws and seed 42. Paired recall difference intervals
+  included zero; AI cautioned against claims of established superiority and
+  explained degenerate intervals when all observed slice events were detected.
+- Failure inspection identified F-7 budget competition, T-12's absence of baseline
+  candidates, and A-9's absence of logistic candidates. These identify algorithmic
+  stages, not verified physical causes.
+- AI corrected an earlier resume discussion: the validation false-alert reduction
+  of 32% is not automatically a held-out reduction. Verifying that reduction would
+  require a separately declared comparator; no additional test tuning was added.
+- AI checked saved result consistency, updated project documentation, and prepared
+  a Git checkpoint. A standalone reproduction command remains to be implemented.

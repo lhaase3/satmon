@@ -1,0 +1,2 @@
+method,channel,start,end,threshold,max_event_probability,event_candidates,selected_in_event
+logistic,A-9,4569,8433,0.13,0.12921726744298634,0,0

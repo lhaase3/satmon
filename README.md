@@ -3,8 +3,14 @@
 CSCI 5622 backend project comparing rolling 3-sigma, regularized Logistic
 Regression, and Random Forest under a fixed analyst review budget.
 
-**Status: scaffold only.** Data loading, training, and evaluation are not yet
-implemented. No measured performance is claimed.
+**Status:** backend functions and notebook experiments implemented. Frozen-model
+held-out evaluation and channel-bootstrap analysis are saved in results/final_test/.
+A standalone reproduction command and final report remain in progress.
+
+On 16 held-out channels containing 19 events, rolling 3-sigma detected 17 events,
+Random Forest 15, and Logistic Regression 13. Paired channel-bootstrap recall
+difference intervals include zero; these data do not establish clear recall
+superiority. See report/findings.md for results and limitations.
 
 ## Setup
 
@@ -33,9 +39,9 @@ results-reproduction command will be added once the experiment works.
 
 ## Layout
 
-- src/satmon/: backend module contracts; algorithms not yet implemented.
+- src/satmon/: labels, causal features, model builders, baseline, and evaluation.
 - configs/: experiment protocol.
-- scripts/ and tests/: future commands and synthetic correctness tests.
+- scripts/: standalone commands pending; tests/: synthetic correctness checks.
 - data/: provenance instructions; raw/ and processed/ are ignored.
 - splits/, results/, report/: assignments, measured artifacts, and AI-use log.
 - docs/rebuild.md: removed components, replacements, and next steps.

@@ -1,0 +1,7 @@
+method,event_type,n_channels,n_events,n_detected_events,event_recall_at_5,ci_lower,ci_upper
+baseline,contextual,5,7,5,0.7142857142857143,0.4,1.0
+baseline,point,11,12,12,1.0,1.0,1.0
+forest,contextual,5,7,6,0.8571428571428571,0.7272727272727273,1.0
+forest,point,11,12,9,0.75,0.5384615384615384,1.0
+logistic,contextual,5,7,4,0.5714285714285714,0.0,0.9090909090909091
+logistic,point,11,12,9,0.75,0.5333333333333333,1.0

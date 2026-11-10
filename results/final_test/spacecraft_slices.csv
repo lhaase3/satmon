@@ -1,0 +1,7 @@
+method,spacecraft,n_channels,n_samples,n_scored_samples,n_events,n_detected_events,n_false_alerts,event_recall_at_5,ci_lower,ci_upper
+baseline,MSL,6,16786,16186,9,7,45,0.7777777777777778,0.5,1.0
+baseline,SMAP,10,81802,80802,10,10,101,1.0,1.0,1.0
+forest,MSL,6,16786,16186,9,7,68,0.7777777777777778,0.6363636363636364,1.0
+forest,SMAP,10,81802,80802,10,8,229,0.8,0.5,1.0
+logistic,MSL,6,16786,16186,9,7,59,0.7777777777777778,0.4444444444444444,1.0
+logistic,SMAP,10,81802,80802,10,6,257,0.6,0.3,0.9
