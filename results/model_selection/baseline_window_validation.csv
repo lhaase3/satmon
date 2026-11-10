@@ -1,0 +1,3 @@
+window_size,events,detected,event_recall_at_5,selected_alerts,false_alerts,secondary_cost
+50,19,17,0.8947368421052632,343,267,287
+100,19,17,0.8947368421052632,251,181,201

@@ -6,5 +6,51 @@
   "missed_anomaly_relative_cost": 10,
   "primary_metric": "event_recall_at_5",
   "primary_methods": ["rolling_3sigma", "logistic_regression", "random_forest"],
-  "status": "protocol only; no experiment runner yet"
+  "status": "selected on validation 2026-11-09; review and clean rerun required before final test",
+  "split_file": "splits/channels.json",
+  "excluded_channels": ["P-2"],
+  "reserved_training_channels": ["P-1"],
+  "feature_columns": ["value", "delta", "rolling_mean", "rolling_std"],
+  "window_size": 100,
+  "first_prediction_index": 100,
+  "feature_reference": "current-inclusive trailing window",
+  "window_label": "any annotated sample in current-inclusive trailing window",
+  "event_endpoints": "inclusive project convention",
+  "event_match": "start <= selected alert index <= end; each event counted once across blocks",
+  "recall_aggregation": "sum detected events / sum annotated events",
+  "warmup_events": "retain all events in denominator, including unscored warmup",
+  "block_assignment": "original sample index // 1000, separately for each channel",
+  "partial_final_block": "same five-alert cap",
+  "alert_ranking": "descending score, then ascending original sample index",
+  "suppression_distance": 10,
+  "suppression_scope": "within block; reject distances <= 10; no cross-block suppression",
+  "candidate_comparison": "strictly greater than threshold",
+  "fit_policy": "fit models, scaling, and PCA on training channels only; no validation refit",
+  "selection_rule": "maximize validation detected events, then minimize false alerts; prefer simpler settings on ties",
+  "baseline": {
+    "reference": "previous 100 samples excluding current",
+    "ddof": 0,
+    "threshold": 3.0,
+    "zero_variance": "score 0 for unchanged value; largest finite float for changed value"
+  },
+  "logistic_regression": {
+    "C": 1.0,
+    "solver": "lbfgs",
+    "max_iter": 1000,
+    "scaling": "StandardScaler",
+    "threshold": 0.13
+  },
+  "random_forest": {
+    "max_depth": 8,
+    "min_samples_leaf": 100,
+    "n_estimators": 100,
+    "threshold": 0.25
+  },
+  "pca_auxiliary": {
+    "components_tested": [2, 3],
+    "C": 1.0,
+    "decision": "retain original features for primary logistic comparison; report observed PCA tradeoff"
+  },
+  "secondary_cost": "10 * missed events + false alerts",
+  "selection_limitations": "exploratory validation tuning; staged rather than full joint search; no uncertainty established yet"
 }

@@ -1,0 +1,21 @@
+{
+  "split": "train",
+  "method": "rolling_3sigma",
+  "reference_window": 50,
+  "reference": "previous samples, excluding current",
+  "standard_deviation_ddof": 0,
+  "candidate_rule": "score > 3",
+  "suppression_distance": 10,
+  "suppression_scope": "within each block",
+  "samples_per_block": 1000,
+  "max_alerts_per_block": 5,
+  "partial_final_block": "same five-alert cap",
+  "event_endpoints": "inclusive",
+  "event_matching": "selected alert index lies inside event",
+  "n_channels": 48,
+  "n_events": 65,
+  "n_detected_events": 58,
+  "n_selected_alerts": 1221,
+  "n_false_alerts": 1019,
+  "event_recall_at_5": 0.8923076923076924
+}
