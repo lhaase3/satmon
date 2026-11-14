@@ -9,10 +9,10 @@ reference and is **not required to reproduce these results**.
 ## Reproduce the headline result
 
 Use **Python 3.12** (original experiments: 3.12.10). Run from the repository root.
-Until the course branch is merged into `main`, clone it explicitly:
+Clone the repository's default branch:
 
 ```bash
-git clone --branch course-backend-rebuild https://github.com/lhaase3/satmon.git
+git clone https://github.com/lhaase3/satmon.git
 cd satmon
 python -m venv .venv
 ```
