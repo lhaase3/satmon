@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
-from satmon.data import make_sample_labels, make_window_labels
+from satmon.data import make_sample_labels, make_window_labels, load_channel_signal, parse_intervals
+from pathlib import Path
 
 def make_basic_features(signal: np.ndarray) -> pd.DataFrame:
     """Return current value and change, indexed by original sample position."""
@@ -95,3 +96,54 @@ def make_channel_examples(
     examples["channel_id"] = channel_id
 
     return examples
+
+
+def assemble_split_examples(
+    annotations: pd.DataFrame,
+    test_dir: str | Path,
+    window_size: int,
+    first_prediction_index: int,
+) -> pd.DataFrame:
+    """Assemble channel examples using an explicit common prediction start."""
+    if annotations.empty or not annotations["chan_id"].is_unique:
+        raise ValueError("Expected nonempty, unique channel annotations")
+
+    if (
+        type(first_prediction_index) is not int
+        or first_prediction_index < max(1, window_size - 1)
+    ):
+        raise ValueError("Prediction start must cover feature warm-up")
+
+    tables = []
+
+    for _, row in annotations.iterrows():
+        signal = load_channel_signal(
+            test_dir,
+            channel_id=row["chan_id"],
+            expected_length=int(row["num_values"]),
+        )
+
+        intervals = parse_intervals(
+            row["anomaly_sequences"],
+            len(signal),
+        )
+
+        examples = make_channel_examples(
+            signal,
+            intervals,
+            channel_id=row["chan_id"],
+            window_size=window_size,
+        ).reset_index()
+
+        examples = examples.loc[
+            examples["sample_index"] >= first_prediction_index
+        ].copy()
+
+        if examples.empty:
+            raise ValueError(
+                f"{row['chan_id']}: no eligible prediction rows"
+            )
+
+        tables.append(examples)
+
+    return pd.concat(tables, ignore_index=True)

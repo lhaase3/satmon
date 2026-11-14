@@ -1,10 +1,7 @@
-"""Planned: safe annotation inventory, genuine array loading, channel splitting.
-
-Preserve spacecraft, channel ID, sample indices, event IDs, and type metadata.
-Flag duplicate annotation rows; do not silently resolve them.
-"""
 import ast
 import numpy as np
+import json
+from pathlib import Path
 
 def parse_intervals(text: str, n_samples: int) -> list[tuple[int, int]]:
     try:
@@ -79,6 +76,60 @@ def make_window_labels(
         window_labels.append(int(np.any(window)))
 
     return prediction_indices, np.asarray(window_labels, dtype=np.int8)
-    
+
+def load_channel_splits(path: str | Path) -> dict[str, list[str]]:
+    """Load saved channel assignments and reject overlapping splits."""
+    record = json.loads(Path(path).read_text(encoding="utf-8"))
+
+    splits = {
+        name: record[name]
+        for name in ["train", "validation", "test"]
+    }
+
+    for name, channels in splits.items():
+        if not isinstance(channels, list) or not channels:
+            raise ValueError(f"{name} must be a nonempty list")
+
+        if any(not isinstance(channel, str) or not channel for channel in channels):
+            raise ValueError(f"{name} contains an invalid channel ID")
+
+        if len(channels) != len(set(channels)):
+            raise ValueError(f"{name} contains duplicate channels")
+
+    for first, second in [
+    ("train", "validation"),
+    ("train", "test"),
+    ("validation", "test"),
+    ]:
+        if not set(splits[first]).isdisjoint(splits[second]):
+            raise ValueError(f"{first} and {second} share channels")
+
+    return splits
+
+
+def load_channel_signal(
+    test_dir: str | Path,
+    channel_id: str,
+    expected_length: int,
+) -> np.ndarray:
+    """Load and validate the telemetry column of one original test array."""
+    path = Path(test_dir) / f"{channel_id}.npy"
+    array = np.load(path, allow_pickle=False)
+
+    if array.ndim != 2 or array.shape[1] < 1:
+        raise ValueError(f"{channel_id}: expected a two-dimensional array")
+
+    if array.shape[0] != expected_length:
+        raise ValueError(
+            f"{channel_id}: expected {expected_length} samples, "
+            f"found {array.shape[0]}"
+        )
+
+    signal = np.asarray(array[:, 0], dtype=float)
+
+    if not np.isfinite(signal).all():
+        raise ValueError(f"{channel_id}: telemetry contains nonfinite values")
+
+    return signal
 
 

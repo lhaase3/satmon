@@ -54,3 +54,6 @@ data/processed/
 .pytest_cache/
 .coverage
 htmlcov/
+
+# Regenerated experiment outputs; reference results remain tracked.
+results/reproduction/

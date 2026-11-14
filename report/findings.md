@@ -75,5 +75,8 @@ while meeting the same budget and offering an acceptable false-alert burden.
 - Endpoints inclusive by project convention. Warm-up events retained. Suppression
   within blocks only. Frozen settings are in configs/protocol.json.
 - Validation 32% baseline false-alert reduction is not a held-out comparison.
-- Complete standalone experiment/reproduction command, dependency and dataset
-  provenance records, interpretation of final trained models, and report writing.
+- November 14 update: standalone test evaluation, bootstrap, failure-plot, and
+  hash-verified data-download commands are available in the root README. A fresh
+  Windows Python 3.12.10 environment reproduced the headline counts and bootstrap
+  tables. Dependency and local dataset hash records are included; the original
+  dataset release version remains unknown. Final report writing remains separate.

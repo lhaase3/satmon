@@ -101,3 +101,20 @@ The original main branch was not modified.
   require a separately declared comparator; no additional test tuning was added.
 - AI checked saved result consistency, updated project documentation, and prepared
   a Git checkpoint. A standalone reproduction command remains to be implemented.
+
+## 2026-11-14: README and reproducibility verification
+
+- At the student's request, AI rewrote the README to document actual installation,
+  data acquisition, frozen evaluation, expected results, and original-app scope.
+- AI authored scripts/download_data.py, which fetches the public Kaggle archive
+  and verifies the 80 required telemetry arrays and annotation CSV against the
+  existing manifest. It does not redistribute the raw dataset in Git.
+- AI installed the pinned dependencies and project in a fresh Python 3.12.10
+  environment on Windows and ran the existing reproduction scripts against a
+  fresh download in an ignored verification directory. The headline counts
+  matched the saved results: baseline 17/19 and 146 false alerts; forest 15/19
+  and 297; logistic 13/19 and 316.
+- All four bootstrap tables matched the original references, the failure figure
+  regenerated, and 54 correctness tests passed. No model settings were retuned.
+  This verifies a fresh environment on Windows, not a separate clean clone or
+  independent macOS/Linux execution. Changes were not pushed during this step.

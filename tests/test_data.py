@@ -1,7 +1,9 @@
 import pytest
 import numpy as np
+import json
 
-from satmon.data import parse_intervals, make_sample_labels, make_window_labels
+
+from satmon.data import parse_intervals, make_sample_labels, make_window_labels, load_channel_splits
 
 
 def test_preserves_event_order():
@@ -91,3 +93,26 @@ def test_window_covering_entire_sequence():
 
     np.testing.assert_array_equal(indices, [2])
     np.testing.assert_array_equal(labels, [1])
+
+
+@pytest.mark.parametrize(
+    "first, second",
+    [
+        ("train", "validation"),
+        ("train", "test"),
+        ("validation", "test"),
+    ],
+)
+def test_split_loader_rejects_overlap(tmp_path, first, second):
+    record = {
+        "train": ["A"],
+        "validation": ["B"],
+        "test": ["C"],
+    }
+    record[second] = record[first].copy()
+
+    path = tmp_path / "channels.json"
+    path.write_text(json.dumps(record), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="share channels"):
+        load_channel_splits(path)
